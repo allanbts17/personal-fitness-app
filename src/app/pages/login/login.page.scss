@@ -1,0 +1,29 @@
+.login-container {
+  max-width: 450px;
+  margin: 60px auto;
+  padding: 20px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.header-section {
+  margin-bottom: 30px;
+  h1 {
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--ion-color-primary);
+  }
+}
+
+ion-item {
+  --background: #fff;
+  --border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.login-btn {
+  --border-radius: 8px;
+  height: 50px;
+  font-weight: 600;
+}

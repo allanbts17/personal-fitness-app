@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Personal Fitness</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="login-container">
+    <div class="header-section ion-text-center">
+      <h1>Fitness App</h1>
+      <p>Train harder, track better</p>
+    </div>
+
+    <ion-list lines="none">
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input type="email" [(ngModel)]="email" placeholder="email@example.com"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Password</ion-label>
+        <ion-input type="password" [(ngModel)]="password" placeholder="********"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" (click)="login()" class="ion-margin-top login-btn">
+      Login
+    </ion-button>
+  </div>
+</ion-content>
