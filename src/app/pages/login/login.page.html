@@ -1,30 +1,88 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Personal Fitness</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="bg-gray-100">
+  <div class="min-h-full flex flex-col justify-center items-center p-4">
+    <!-- Main Card -->
+    <div class="w-full max-w-[400px] bg-white rounded-lg shadow-material p-8 transition-all">
+      
+      <!-- Icon/Avatar -->
+      <div class="flex justify-center mb-6">
+        <div class="w-16 h-16 bg-material-blue rounded-full flex items-center justify-center shadow-lg">
+          <ion-icon name="person" class="text-white text-3xl"></ion-icon>
+        </div>
+      </div>
 
-<ion-content class="ion-padding">
-  <div class="login-container">
-    <div class="header-section ion-text-center">
-      <h1>Fitness App</h1>
-      <p>Train harder, track better</p>
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-medium text-gray-800 m-0">Sign in</h1>
+        <p class="text-sm text-gray-500 mt-1">to continue to your account</p>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="space-y-6">
+        <div class="relative group">
+          <input type="email" [(ngModel)]="email" id="email" 
+                 class="peer w-full border-b border-gray-300 py-2 pt-6 outline-none transition-all focus:border-material-blue bg-transparent"
+                 placeholder=" " />
+          <label for="email" 
+                 class="absolute left-0 top-6 text-gray-400 text-sm transition-all peer-focus:top-0 peer-focus:text-xs peer-focus:text-material-blue peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs">
+            Email
+          </label>
+        </div>
+
+        <div class="relative group">
+          <input type="password" [(ngModel)]="password" id="password" 
+                 class="peer w-full border-b border-gray-300 py-2 pt-6 outline-none transition-all focus:border-material-blue bg-transparent"
+                 placeholder=" " />
+          <label for="password" 
+                 class="absolute left-0 top-6 text-gray-400 text-sm transition-all peer-focus:top-0 peer-focus:text-xs peer-focus:text-material-blue peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs text-nowrap">
+            Password
+          </label>
+          <div class="absolute right-0 top-6 text-gray-400 cursor-pointer">
+            <ion-icon name="eye-outline"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="flex items-center justify-between mt-8 mb-6">
+        <div class="flex items-center">
+          <input type="checkbox" id="remember" class="w-4 h-4 text-material-blue border-gray-300 rounded focus:ring-material-blue" />
+          <label for="remember" class="ml-2 text-sm text-gray-600">Keep me signed in</label>
+        </div>
+        <a href="#" class="text-xs font-medium text-material-blue uppercase tracking-wider hover:underline">Forgot Password?</a>
+      </div>
+
+      <!-- Sign In Button -->
+      <button (click)="login()" 
+              class="w-full bg-material-blue text-white py-3 rounded shadow-md hover:bg-material-blue-dark active:shadow-lg transition-all font-medium uppercase text-sm tracking-wide mb-8">
+        Sign In
+      </button>
+
+      <!-- Divider -->
+      <div class="relative flex items-center mb-8">
+        <div class="flex-grow border-t border-gray-200"></div>
+        <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">or</span>
+        <div class="flex-grow border-t border-gray-200"></div>
+      </div>
+
+      <!-- Social Logins -->
+      <div class="space-y-3">
+        <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-all text-sm text-gray-600">
+          <ion-icon name="logo-google" class="text-lg mr-2 text-red-500"></ion-icon>
+          Continue with Google
+        </button>
+        <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-all text-sm text-gray-600">
+          <ion-icon name="logo-facebook" class="text-lg mr-2 text-blue-600"></ion-icon>
+          Continue with Facebook
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <p class="text-sm text-gray-600">
+          Don't have an account? <a href="#" class="text-material-blue font-medium hover:underline">Create account</a>
+        </p>
+      </div>
+
     </div>
-
-    <ion-list lines="none">
-      <ion-item class="ion-margin-bottom">
-        <ion-label position="stacked">Email</ion-label>
-        <ion-input type="email" [(ngModel)]="email" placeholder="email@example.com"></ion-input>
-      </ion-item>
-
-      <ion-item class="ion-margin-bottom">
-        <ion-label position="stacked">Password</ion-label>
-        <ion-input type="password" [(ngModel)]="password" placeholder="********"></ion-input>
-      </ion-item>
-    </ion-list>
-
-    <ion-button expand="block" (click)="login()" class="ion-margin-top login-btn">
-      Login
-    </ion-button>
   </div>
 </ion-content>

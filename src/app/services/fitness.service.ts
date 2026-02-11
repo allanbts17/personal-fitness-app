@@ -49,14 +49,16 @@ export class FitnessService {
         const colRef = collection(this.firestore, 'workout_logs');
         const q = query(colRef, where('userId', '==', userId), orderBy('date', 'desc'));
         return collectionData(q, { idField: 'id' }) as Observable<WorkoutLog[]>;
-        // USER PROFILE & PHYSICAL DATA
-        updatePhysicalData(userId: string, data: { weight: number, bmi: number }) {
-            const docRef = doc(this.firestore, `users/${userId}`);
-            return updateDoc(docRef, {
-                physicalData: {
-                    ...data,
-                    lastUpdate: new Date()
-                }
-            });
-        }
     }
+
+    // USER PROFILE & PHYSICAL DATA
+    updatePhysicalData(userId: string, data: { weight: number, bmi: number }) {
+        const docRef = doc(this.firestore, `users/${userId}`);
+        return updateDoc(docRef, {
+            physicalData: {
+                ...data,
+                lastUpdate: new Date()
+            }
+        });
+    }
+}

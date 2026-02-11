@@ -48,7 +48,7 @@ export class AuthService {
         return docSnap.exists() ? docSnap.data() as UserProfile : null;
     }
 
-    async hasRole(role: UserRole): Observable<boolean> {
+    async hasRole(role: UserRole): Promise<Observable<boolean>> {
         return this.currentUser$.pipe(
             map(profile => profile?.role === role)
         );
