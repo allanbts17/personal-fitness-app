@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-user-home',
-    template: `
+  selector: 'app-user-home',
+  template: `
     <ion-header>
       <ion-toolbar color="tertiary">
         <ion-title>My Fitness</ion-title>
@@ -12,6 +12,7 @@ import { Component } from '@angular/core';
       <h1>Welcome back!</h1>
       <p>Today's routines and progress tracking will be here.</p>
     </ion-content>
-  `
+  `,
+  standalone: false
 })
 export class UserHomePage { }

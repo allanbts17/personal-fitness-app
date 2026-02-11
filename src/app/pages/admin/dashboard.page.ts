@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-admin-dashboard',
-    template: `
+  selector: 'app-admin-dashboard',
+  template: `
     <ion-header>
       <ion-toolbar color="danger">
         <ion-title>Admin Dashboard</ion-title>
@@ -12,6 +12,7 @@ import { Component } from '@angular/core';
       <h1>Welcome, Admin</h1>
       <p>System monitoring and user management will be here.</p>
     </ion-content>
-  `
+  `,
+  standalone: false
 })
 export class AdminDashboardPage { }
