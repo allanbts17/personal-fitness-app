@@ -16,7 +16,6 @@
       <ion-item lines="none" class="bg-gray-50 rounded-lg mb-4">
         <ion-label position="stacked" class="text-gray-600 font-semibold mb-2">Contraseña Temporal para todos</ion-label>
         <ion-input 
-          type="password" 
           [(ngModel)]="tempPassword" 
           placeholder="Mínimo 6 caracteres"
           class="text-gray-800">
@@ -28,11 +27,11 @@
       <h2 class="text-lg font-bold text-gray-800 mb-4">Correos Electrónicos</h2>
       
       <!-- List of emails -->
-      <div *ngFor="let email of emails; let i = index" class="flex items-center space-x-2 mb-3">
-        <ion-item lines="none" class="bg-gray-50 rounded-lg flex-grow">
+      <div *ngFor="let email of emails; let i = index; trackBy: trackByFn" class="flex items-center space-x-2 mb-3">
+        <ion-item class="bg-gray-50 rounded-lg flex-grow">
           <ion-input 
             type="email" 
-            [(ngModel)]="emails[i]" 
+            [(ngModel)]="emails[i].value" 
             [placeholder]="'Correo del cliente ' + (i + 1)"
             class="text-gray-800">
           </ion-input>

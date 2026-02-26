@@ -9,7 +9,12 @@ import { LoadingController, ToastController, NavController } from '@ionic/angula
 })
 export class RegisterClientsPage {
     tempPassword: string = '';
-    emails: string[] = ['', '', '', ''];
+    emails: { value: string }[] = [
+        { value: '' },
+        { value: '' },
+        { value: '' },
+        { value: '' }
+    ];
     instructorId: string = '';
 
     constructor(
@@ -26,19 +31,25 @@ export class RegisterClientsPage {
     }
 
     addEmailField() {
-        this.emails.push('');
+        this.emails.push({ value: '' });
     }
 
     removeEmailField(index: number) {
         if (this.emails.length > 1) {
             this.emails.splice(index, 1);
         } else {
-            this.emails[0] = '';
+            this.emails[0].value = '';
         }
     }
 
+    trackByFn(index: number, item: any) {
+        return index;
+    }
+
     async registerClients() {
-        const validEmails = this.emails.filter(e => e.trim() !== '');
+        const validEmails = this.emails
+            .map(e => e.value)
+            .filter(email => email.trim() !== '');
 
         if (validEmails.length === 0) {
             this.showToast('Por favor, ingresa al menos un correo.', 'warning');
