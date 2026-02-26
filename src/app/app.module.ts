@@ -24,7 +24,12 @@ import { AppRoutingModule } from './app-routing.module';
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => getAuth()),
-        provideFirestore(() => getFirestore())
+        provideFirestore(() => {
+            const app = initializeApp(environment.firebase);
+            const firestore = getFirestore(app, environment.firebase.databaseId || '(default)');
+            console.log('Firestore initialized with database:', environment.firebase.databaseId || '(default)');
+            return firestore;
+        })
     ],
     bootstrap: [AppComponent],
 })

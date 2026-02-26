@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, UserCredential } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, map, shareReplay } from 'rxjs/operators';
@@ -40,6 +40,31 @@ export class AuthService {
         };
         await setDoc(doc(this.firestore, `users/${res.user.uid}`), profile);
         return profile;
+    }
+
+    async setProfile(res: UserCredential, email: string, displayName: string, role: UserRole, assignedInstructorId: string) {
+        const profile: UserProfile = {
+            uid: res.user.uid,
+            email,
+            displayName,
+            role,
+            assignedInstructorId: assignedInstructorId
+        };
+        console.log(profile);
+        await setDoc(doc(this.firestore, `users/${profile.uid}`), profile);
+    }
+
+    async testFirestore() {
+        console.log('Firestore Test: Starting write attempt...');
+        try {
+            const docRef = doc(this.firestore, `users/asaegg`);
+            console.log('Firestore Test: Document reference created', docRef.path);
+            await setDoc(docRef, { id: 'asaegg', name: 'Allan', timestamp: new Date() });
+            console.log('Firestore Test Successful: Document written successfully');
+        } catch (error) {
+            console.error('Firestore Test Failed with error:', error);
+            throw error;
+        }
     }
 
     async getUserProfile(uid: string): Promise<UserProfile | null> {
