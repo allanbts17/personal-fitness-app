@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, UserCredential } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, UserCredential, updatePassword, sendPasswordResetEmail } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, map, shareReplay } from 'rxjs/operators';
@@ -71,6 +71,16 @@ export class AuthService {
         const docRef = doc(this.firestore, `users/${uid}`);
         const docSnap = await getDoc(docRef);
         return docSnap.exists() ? docSnap.data() as UserProfile : null;
+    }
+
+    async updateUserPassword(newPassword: string) {
+        const currentUser = this.auth.currentUser;
+        if (!currentUser) throw new Error('No user logged in');
+        return updatePassword(currentUser, newPassword);
+    }
+
+    async sendResetPasswordEmail(email: string) {
+        return sendPasswordResetEmail(this.auth, email);
     }
 
     async hasRole(role: UserRole): Promise<Observable<boolean>> {

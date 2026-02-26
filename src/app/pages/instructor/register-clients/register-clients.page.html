@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/instructor/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registrar Clientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-gray-50">
+  <div class="max-w-xl mx-auto mt-4">
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Configuración de Registro</h2>
+      
+      <!-- Password field -->
+      <ion-item lines="none" class="bg-gray-50 rounded-lg mb-4">
+        <ion-label position="stacked" class="text-gray-600 font-semibold mb-2">Contraseña Temporal para todos</ion-label>
+        <ion-input 
+          type="password" 
+          [(ngModel)]="tempPassword" 
+          placeholder="Mínimo 6 caracteres"
+          class="text-gray-800">
+        </ion-input>
+      </ion-item>
+
+      <p class="text-xs text-gray-500 mb-6">Esta contraseña se aplicará a todos los correos ingresados a continuación.</p>
+
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Correos Electrónicos</h2>
+      
+      <!-- List of emails -->
+      <div *ngFor="let email of emails; let i = index" class="flex items-center space-x-2 mb-3">
+        <ion-item lines="none" class="bg-gray-50 rounded-lg flex-grow">
+          <ion-input 
+            type="email" 
+            [(ngModel)]="emails[i]" 
+            [placeholder]="'Correo del cliente ' + (i + 1)"
+            class="text-gray-800">
+          </ion-input>
+        </ion-item>
+        <ion-button fill="clear" color="danger" (click)="removeEmailField(i)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Add field button -->
+      <ion-button fill="outline" expand="block" (click)="addEmailField()" class="mt-4">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Añadir otro campo
+      </ion-button>
+    </div>
+
+    <!-- Confirm Registration button -->
+    <ion-button expand="block" color="primary" class="ion-margin-top h-12 font-bold" (click)="registerClients()">
+      CONFIRMAR Y REGISTRAR TODOS
+    </ion-button>
+  </div>
+</ion-content>
