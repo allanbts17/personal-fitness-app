@@ -12,8 +12,8 @@
 
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-2xl font-medium text-gray-800 m-0">Sign in</h1>
-        <p class="text-sm text-gray-500 mt-1">to continue to your account</p>
+        <h1 class="text-2xl font-medium text-gray-800 m-0">Iniciar sesión</h1>
+        <p class="text-sm text-gray-500 mt-1">para continuar con tu cuenta</p>
       </div>
 
 
@@ -23,9 +23,9 @@
           <ion-input
             type="email"
             [(ngModel)]="email"
-            label="Email"
+            label="Correo electrónico"
             label-placement="floating"
-            placeholder="you@example.com"
+            placeholder="usuario@ejemplo.com"
             autocomplete="email"
           ></ion-input>
         </ion-item>
@@ -35,7 +35,7 @@
             color="primary"
             type="password"
             [(ngModel)]="password"
-            label="Password"
+            label="Contraseña"
             label-placement="floating"
             placeholder="••••••••"
             [type]="showPassword ? 'text' : 'password'"
@@ -50,21 +50,21 @@
       <div class="flex items-center justify-between mt-8 mb-6">
         <div class="flex items-center">
           <input type="checkbox" id="remember" class="w-4 h-4 text-material-blue border-gray-300 rounded focus:ring-material-blue" />
-          <label for="remember" class="ml-2 text-sm text-gray-600">Keep me signed in</label>
+          <label for="remember" class="ml-2 text-sm text-gray-600">Mantener sesión iniciada</label>
         </div>
-        <a href="#" class="text-xs font-medium text-material-blue uppercase tracking-wider hover:underline">Forgot Password?</a>
+        <a href="#" class="text-xs font-medium text-material-blue uppercase tracking-wider hover:underline">¿Olvidaste tu contraseña?</a>
       </div>
 
       <!-- Sign In Button -->
       <button (click)="login()" 
               class="w-full bg-material-blue text-white py-3 rounded shadow-md hover:bg-material-blue-dark active:shadow-lg transition-all font-medium uppercase text-sm tracking-wide mb-8">
-        Sign In
+        Iniciar Sesión
       </button>
 
       <!-- Divider -->
       <div class="relative flex items-center mb-8">
         <div class="flex-grow border-t border-gray-200"></div>
-        <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">or</span>
+        <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">o</span>
         <div class="flex-grow border-t border-gray-200"></div>
       </div>
 
@@ -72,18 +72,18 @@
       <div class="space-y-3">
         <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-all text-sm text-gray-600">
           <ion-icon name="logo-google" class="text-lg mr-2 text-red-500"></ion-icon>
-          Continue with Google
+          Continuar con Google
         </button>
         <button class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition-all text-sm text-gray-600">
           <ion-icon name="logo-facebook" class="text-lg mr-2 text-blue-600"></ion-icon>
-          Continue with Facebook
+          Continuar con Facebook
         </button>
       </div>
 
       <!-- Footer -->
       <div class="text-center mt-8">
         <p class="text-sm text-gray-600">
-          Don't have an account? <a href="#" class="text-material-blue font-medium hover:underline">Create account</a>
+          ¿No tienes cuenta? <a href="#" class="text-material-blue font-medium hover:underline">Crear cuenta</a>
         </p>
       </div>
 
