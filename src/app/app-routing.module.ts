@@ -15,19 +15,19 @@ const routes: Routes = [
     {
         path: 'admin',
         loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         data: { roles: ['admin'] }
     },
     {
         path: 'instructor',
         loadChildren: () => import('./pages/instructor/instructor.module').then(m => m.InstructorPageModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         data: { roles: ['instructor'] }
     },
     {
         path: 'user',
         loadChildren: () => import('./pages/user/user.module').then(m => m.UserPageModule),
-        canActivate: [RoleGuard],
+        //canActivate: [RoleGuard],
         data: { roles: ['user'] }
     },
 ];

@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginPage {
     email = '';
     password = '';
+    showPassword = false;
 
     constructor(private auth: AuthService, private router: Router) { }
 

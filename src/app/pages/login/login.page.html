@@ -16,30 +16,34 @@
         <p class="text-sm text-gray-500 mt-1">to continue to your account</p>
       </div>
 
-      <!-- Form Inputs -->
-      <div class="space-y-6">
-        <div class="relative group">
-          <input type="email" [(ngModel)]="email" id="email" 
-                 class="peer w-full border-b border-gray-300 py-2 pt-6 outline-none transition-all focus:border-material-blue bg-transparent"
-                 placeholder=" " />
-          <label for="email" 
-                 class="absolute left-0 top-6 text-gray-400 text-sm transition-all peer-focus:top-0 peer-focus:text-xs peer-focus:text-material-blue peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs">
-            Email
-          </label>
-        </div>
 
-        <div class="relative group">
-          <input type="password" [(ngModel)]="password" id="password" 
-                 class="peer w-full border-b border-gray-300 py-2 pt-6 outline-none transition-all focus:border-material-blue bg-transparent"
-                 placeholder=" " />
-          <label for="password" 
-                 class="absolute left-0 top-6 text-gray-400 text-sm transition-all peer-focus:top-0 peer-focus:text-xs peer-focus:text-material-blue peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs text-nowrap">
-            Password
-          </label>
-          <div class="absolute right-0 top-6 text-gray-400 cursor-pointer">
-            <ion-icon name="eye-outline"></ion-icon>
-          </div>
-        </div>
+      <!-- Form Inputs -->
+      <div class="space-y-2">
+        <ion-item lines="none" class="input-item">
+          <ion-input
+            type="email"
+            [(ngModel)]="email"
+            label="Email"
+            label-placement="floating"
+            placeholder="you@example.com"
+            autocomplete="email"
+          ></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-input
+            color="primary"
+            type="password"
+            [(ngModel)]="password"
+            label="Password"
+            label-placement="floating"
+            placeholder="••••••••"
+            [type]="showPassword ? 'text' : 'password'"
+          ></ion-input>
+          <ion-button slot="end" fill="clear" class="eye-btn" (click)="showPassword = !showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="text-gray-400"></ion-icon>
+          </ion-button>
+        </ion-item>
       </div>
 
       <!-- Options -->
