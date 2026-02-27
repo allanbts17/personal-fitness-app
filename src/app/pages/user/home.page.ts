@@ -1,38 +1,105 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { FitnessService } from '../../services/fitness.service';
+import { UserProfile } from '../../models/fitness.models';
+import { ModalController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-user-home',
-  template: `
-    <app-header title="Mi Fitness"></app-header>
-    <ion-content class="ion-padding bg-gray-50">
-      <div class="max-w-4xl mx-auto mt-8">
-        <div class="bg-material-blue text-white p-6 rounded-2xl shadow-lg mb-8">
-          <h1 class="text-3xl font-bold mb-2">¡Bienvenido de nuevo!</h1>
-          <p class="opacity-90">¿Listo para tu entrenamiento de hoy?</p>
-        </div>
-
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">Rutina de Hoy</h3>
-          <div class="flex items-center text-gray-400 py-8 justify-center border-2 border-dashed border-gray-100 rounded-lg">
-            <p>No hay rutinas asignadas para hoy</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Entrenamientos</p>
-            <p class="text-2xl font-bold text-material-blue">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Rachas</p>
-            <p class="text-2xl font-bold text-orange-500">0 días</p>
-          </div>
-        </div>
-      </div>
-    </ion-content>
-  `,
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
   standalone: false
 })
-export class UserHomePage { }
+export class UserHomePage implements OnInit {
+  userProfile: UserProfile | null = null;
+
+  // Data for the modal
+  isFirstTimeModalOpen: boolean = false;
+  inputWeight: number | null = null;
+  inputWeightUnit: 'kg' | 'lb' = 'lb';
+  inputHeight: number | null = null; // cm
+
+  constructor(
+    private authService: AuthService,
+    private fitnessService: FitnessService,
+    private toastCtrl: ToastController
+  ) { }
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(profile => {
+      if (profile) {
+        this.userProfile = profile;
+        if (profile.role === 'user' && (!profile.physicalData?.weight || !profile.physicalData?.height)) {
+          // Si es la primera vez o no tiene datos completos Y ES UN USUARIO
+          this.isFirstTimeModalOpen = true;
+        } else {
+          // Cargar en el form por si edita
+          this.inputWeight = profile.physicalData?.weight || null;
+          this.inputWeightUnit = profile.physicalData?.weightUnit || 'lb';
+          this.inputHeight = profile.physicalData?.height || null;
+        }
+      }
+    });
+  }
+
+  openEditModal() {
+    this.isFirstTimeModalOpen = true;
+  }
+
+  closeEditModal() {
+    // Si no tiene datos en absoluto, no dejamos que lo cierre para que sea obligatorio el 1er ingreso
+    if (!this.userProfile?.physicalData?.weight || !this.userProfile?.physicalData?.height) {
+      this.mostrarToast('Por favor completa tus datos para continuar.', 'warning');
+      return;
+    }
+    this.isFirstTimeModalOpen = false;
+  }
+
+  async savePhysicalData() {
+    if (!this.inputWeight || !this.inputHeight || !this.userProfile) {
+      this.mostrarToast('Por favor, ingresa tu peso y altura.', 'warning');
+      return;
+    }
+
+    // Calcular IMC
+    // Formula IMC: peso(kg) / (altura(m) * altura(m))
+    let weightKg = this.inputWeightUnit === 'lb' ? this.inputWeight * 0.453592 : this.inputWeight;
+    let heightM = this.inputHeight / 100;
+    let computedBmi = weightKg / (heightM * heightM);
+
+    try {
+      await this.fitnessService.updatePhysicalData(this.userProfile.uid, {
+        weight: this.inputWeight,
+        weightUnit: this.inputWeightUnit,
+        height: this.inputHeight,
+        bmi: computedBmi
+      });
+
+      this.isFirstTimeModalOpen = false;
+      this.mostrarToast('Datos guardados correctamente', 'success');
+
+      // Actualizar localmente para no esperar recarga pesada
+      if (!this.userProfile.physicalData) {
+        this.userProfile.physicalData = { weight: 0, weightUnit: 'lb', height: 0, bmi: 0, lastUpdate: new Date() };
+      }
+      this.userProfile.physicalData.weight = this.inputWeight;
+      this.userProfile.physicalData.weightUnit = this.inputWeightUnit;
+      this.userProfile.physicalData.height = this.inputHeight;
+      this.userProfile.physicalData.bmi = computedBmi;
+
+    } catch (error) {
+      console.error(error);
+      this.mostrarToast('Ocurrió un error al guardar los datos', 'danger');
+    }
+  }
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 2500,
+      color: color
+    });
+    toast.present();
+  }
+}
 

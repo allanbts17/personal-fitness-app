@@ -10,15 +10,30 @@ import { ComponentsModule } from '../../components/components.module';
 @NgModule({
     imports: [
         CommonModule,
-        IonicModule,
         FormsModule,
+        IonicModule,
         ComponentsModule,
         RouterModule.forChild([
-            { path: 'dashboard', component: InstructorDashboardPage },
-            { path: 'register-clients', component: RegisterClientsPage },
+            {
+                path: 'dashboard',
+                component: InstructorDashboardPage
+            },
             {
                 path: 'manage-routines',
                 loadChildren: () => import('./manage-routines/manage-routines.module').then(m => m.ManageRoutinesPageModule)
+            },
+            {
+                path: 'register-clients',
+                component: RegisterClientsPage
+            },
+            {
+                path: 'clients',
+                loadChildren: () => import('./clients/clients.module').then(m => m.ClientsPageModule)
+            },
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
             }
         ])
     ],

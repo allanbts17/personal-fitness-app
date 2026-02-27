@@ -1,0 +1,79 @@
+<div class="mb-6 border-none">
+  <div class="flex justify-between items-center mb-4 px-2">
+    <h2 class="text-2xl font-bold text-gray-900 tracking-tight">IMC</h2>
+    <div 
+       (click)="edit()"
+       class="bg-[#2a52be] hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-xl cursor-pointer shadow-md transition-colors">
+      Editar
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative">
+    
+    <!-- Top Row: BMI Value and Category -->
+    <div class="flex justify-between items-end mb-8">
+      <div class="text-[3.5rem] leading-none font-extrabold text-black tracking-tighter">
+        {{ bmi | number:'1.1-1' }}
+      </div>
+      <div class="flex items-center space-x-2 pb-2">
+        <div class="w-5 h-5 rounded-full" [style.backgroundColor]="categoryColor"></div>
+        <span class="text-lg text-gray-800 font-medium">{{ category }}</span>
+      </div>
+    </div>
+
+    <!-- Main BMI Progress Bar -->
+    <div class="relative w-full mb-8 mt-6 select-none">
+      
+      <!-- Arrow Indicator -->
+      <div class="absolute -top-3 w-4 h-4 z-10 transform -translate-x-1/2 transition-all duration-500 ease-out" [style.left]="indicatorPosition">
+         <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-900 drop-shadow-md">
+            <path d="M12 21l-12-18h24z"></path>
+         </svg>
+      </div>
+
+      <!-- Color Segments -->
+      <div class="flex h-4 w-full gap-1">
+        <div class="bg-[#4169E1] h-full rounded-l-md" style="flex: 0.15"></div> <!-- < 16 -->
+        <div class="bg-[#6495ED] h-full" style="flex: 0.25"></div> <!-- 16 - 18.5 -->
+        <div class="bg-[#78C5D6] h-full" style="flex: 0.2"></div> <!-- 18.5 - 25 -->
+        <div class="bg-[#F4D03F] h-full" style="flex: 0.15"></div> <!-- 25 - 30 -->
+        <div class="bg-[#F0B27A] h-full" style="flex: 0.15"></div> <!-- 30 - 35 -->
+        <div class="bg-[#CD5C5C] h-full rounded-r-md" style="flex: 0.1"></div> <!-- 35+ -->
+      </div>
+      
+      <!-- Segment Text Labels -->
+      <div class="flex justify-between w-full mt-3 px-1 text-sm font-medium text-gray-800">
+        <span>15</span>
+        <span class="-ml-2">16</span>
+        <span>18.5</span>
+        <span>25</span>
+        <span>30</span>
+        <span>35</span>
+        <span>40</span>
+      </div>
+    </div>
+    
+    <!-- Divider -->
+    <div class="border-t border-gray-100 my-4"></div>
+
+    <!-- Bottom Row: Height & Weight -->
+    <div class="grid grid-cols-2 gap-4 pt-2">
+      <div class="flex justify-between items-center border-r border-gray-100 pr-4">
+        <span class="text-xl text-gray-500 font-medium">Peso</span>
+        <div class="flex items-center space-x-1">
+          <span class="text-2xl font-extrabold text-black">{{ weight | number:'1.1-1' }}</span>
+          <span class="text-sm font-bold text-gray-400 uppercase">{{ weightUnit }}</span>
+        </div>
+      </div>
+      
+      <div class="flex justify-between items-center pl-2">
+        <span class="text-xl text-gray-500 font-medium">Altura</span>
+        <div class="flex items-center space-x-1">
+          <span class="text-2xl font-extrabold text-black">{{ height }}</span>
+          <span class="text-sm font-bold text-gray-400">cm</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

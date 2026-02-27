@@ -1,0 +1,128 @@
+<app-header title="Mi Fitness"></app-header>
+<ion-content class="ion-padding bg-gray-50">
+  <div class="max-w-4xl mx-auto mt-8">
+    <div class="bg-[#2a52be] text-white p-6 rounded-3xl shadow-lg mb-8 relative overflow-hidden">
+      <!-- Decorative circles -->
+      <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
+      <div class="absolute bottom-0 right-16 -mb-10 w-24 h-24 rounded-full bg-white opacity-10"></div>
+      
+      <h1 class="text-3xl font-bold mb-2 relative z-10">¡Bienvenido de nuevo!</h1>
+      <p class="opacity-90 relative z-10">¿Listo para tu entrenamiento de hoy?, {{ userProfile?.displayName?.split(' ')?.[0] || 'Atleta' }}</p>
+    </div>
+
+    <!-- TARJETA DE IMC -->
+    <app-imc-card 
+       *ngIf="userProfile?.physicalData"
+       [bmi]="userProfile?.physicalData?.bmi || 0"
+       [height]="userProfile?.physicalData?.height || 0"
+       [weight]="userProfile?.physicalData?.weight || 0"
+       [weightUnit]="userProfile?.physicalData?.weightUnit || 'lb'"
+       (onEdit)="openEditModal()">
+    </app-imc-card>
+
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">Rutina de Hoy</h3>
+      <div class="flex items-center text-gray-400 py-8 justify-center border-2 border-dashed border-gray-100 rounded-lg">
+        <p>No hay rutinas asignadas para hoy</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Entrenamientos</p>
+        <p class="text-3xl font-extrabold text-[#2a52be]">0</p>
+      </div>
+      <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Rachas</p>
+        <p class="text-3xl font-extrabold text-orange-500">0 <span class="text-lg font-semibold">días</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMP: MODAL DE REGISTRO DE DATOS FÍSICOS -->
+  <ion-modal [isOpen]="isFirstTimeModalOpen" [backdropDismiss]="false" class="auto-fit-modal">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="light">
+          <ion-title class="font-bold text-gray-800" style="padding-left: 20px;">Mi Perfil Físico</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeEditModal()">
+              <ion-icon name="close-outline" slot="icon-only" class="text-gray-500"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <!-- Restauramos ion-content para que tome automáticamente el 100% en celular (resolviendo el bug del espacio arriba) -->
+      <ion-content class="bg-gray-50">
+        <div class="max-w-md mx-auto mt-8 px-6 text-center pb-8">
+          
+          <div class="bg-[#eef2ff] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-[#2a52be]">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+             </svg>
+          </div>
+
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Configura tus medidas</h2>
+          <p class="text-gray-500 mb-8 px-4 text-sm">Necesitamos saber tu peso y altura para calcular tu IMC y personalizar tu experiencia de entrenamiento.</p>
+
+          <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-6 text-left">
+            
+            <!-- PESO -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                 <label class="block text-sm font-semibold text-gray-700">Tu Peso</label>
+                 <!-- Segment control for kg/lb -->
+                 <div class="bg-gray-100 p-1 rounded-xl inline-flex shadow-inner">
+                    <button 
+                       (click)="inputWeightUnit = 'lb'"
+                       class="px-4 py-1.5 text-sm font-bold rounded-lg transition-all duration-200"
+                       [ngClass]="inputWeightUnit === 'lb' ? 'bg-white shadow scale-105 text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
+                       LB
+                    </button>
+                    <button 
+                       (click)="inputWeightUnit = 'kg'"
+                       class="px-4 py-1.5 text-sm font-bold rounded-lg transition-all duration-200 ml-1"
+                       [ngClass]="inputWeightUnit === 'kg' ? 'bg-white shadow scale-105 text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
+                       KG
+                    </button>
+                 </div>
+              </div>
+              <ion-input
+                type="number"
+                [(ngModel)]="inputWeight"
+                placeholder="Ej. 150"
+                class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold text-xl"
+              ></ion-input>
+            </div>
+
+            <!-- ALTURA -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Tu Altura (cm)</label>
+              <ion-input
+                type="number"
+                [(ngModel)]="inputHeight"
+                placeholder="Ej. 175"
+                class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold text-xl"
+              ></ion-input>
+            </div>
+
+          </div>
+
+          <div class="mt-8 mb-4">
+            <ion-button 
+               (click)="savePhysicalData()" 
+               expand="block" 
+               class="font-bold tracking-wide h-14"
+               shape="round" 
+               color="primary">
+               Guardar y Continuar
+            </ion-button>
+          </div>
+
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

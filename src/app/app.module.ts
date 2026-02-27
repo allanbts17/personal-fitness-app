@@ -26,8 +26,7 @@ import { AppRoutingModule } from './app-routing.module';
         provideAuth(() => getAuth()),
         provideFirestore(() => {
             const app = initializeApp(environment.firebase);
-            const firestore = getFirestore(app, environment.firebase.databaseId || '(default)');
-            console.log('Firestore initialized with database:', environment.firebase.databaseId || '(default)');
+            const firestore = getFirestore(app, environment.databaseId);
             return firestore;
         })
     ],

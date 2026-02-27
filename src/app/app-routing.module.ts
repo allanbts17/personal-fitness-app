@@ -33,6 +33,10 @@ const routes: Routes = [
     path: 'manage-routines',
     loadChildren: () => import('./pages/instructor/manage-routines/manage-routines.module').then( m => m.ManageRoutinesPageModule)
   },
+  {
+    path: 'clients',
+    loadChildren: () => import('./pages/instructor/clients/clients.module').then( m => m.ClientsPageModule)
+  },
 
 ];
 

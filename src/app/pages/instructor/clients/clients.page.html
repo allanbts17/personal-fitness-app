@@ -1,0 +1,78 @@
+<app-header title="Mis Clientes" [showBackButton]="true"></app-header>
+
+<ion-content class="bg-gray-50 ion-padding">
+  <div class="max-w-4xl mx-auto mt-4">
+
+    <!-- Cargando -->
+    <div *ngIf="isLoading" class="flex justify-center mt-10">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+
+    <!-- Vacío -->
+    <div *ngIf="!isLoading && clients.length === 0" class="text-center mt-16 text-gray-500">
+      <ion-icon name="people-outline" class="text-6xl mb-4 text-gray-300"></ion-icon>
+      <h2 class="text-xl font-bold">Sin clientes</h2>
+      <p>Aún no hay clientes registrados en el sistema.</p>
+    </div>
+
+    <!-- Lista de Clientes -->
+    <div *ngIf="!isLoading && clients.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngFor="let client of clients" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        <!-- Encabezado Cliente -->
+        <div class="p-5 border-b border-gray-50 flex items-center space-x-4">
+          <div class="bg-blue-100 text-blue-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl uppercase">
+            {{ client.displayName ? client.displayName.charAt(0) : 'U' }}
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-gray-800">{{ client.displayName || 'Usuario' }}</h3>
+            <p class="text-sm text-gray-500">{{ client.email }}</p>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Datos Físicos -->
+          <div *ngIf="client.physicalData" class="flex justify-between items-center bg-gray-50 rounded-xl p-3">
+            <div class="text-center px-2">
+              <p class="text-xs text-gray-500 uppercase font-semibold">Peso</p>
+              <p class="font-bold text-gray-800">{{ client.physicalData.weight }} <span class="text-xs">{{ client.physicalData.weightUnit }}</span></p>
+            </div>
+            <div class="w-px h-8 bg-gray-200"></div>
+            <div class="text-center px-2">
+              <p class="text-xs text-gray-500 uppercase font-semibold">Altura</p>
+              <p class="font-bold text-gray-800">{{ client.physicalData.height }} <span class="text-xs">cm</span></p>
+            </div>
+            <div class="w-px h-8 bg-gray-200"></div>
+            <div class="text-center px-2">
+              <p class="text-xs text-gray-500 uppercase font-semibold">IMC</p>
+              <p class="font-bold text-blue-600">{{ client.physicalData.bmi | number:'1.1-1' }}</p>
+            </div>
+          </div>
+          <div *ngIf="!client.physicalData" class="bg-yellow-50 text-yellow-700 text-sm rounded-xl p-3 text-center">
+            Aún no ha registrado datos físicos
+          </div>
+
+          <!-- Progreso -->
+          <div>
+            <h4 class="text-xs text-gray-500 uppercase font-bold mb-3 tracking-wide">Progreso General</h4>
+            <div class="flex justify-between items-end mb-1">
+              <span class="text-sm font-semibold text-gray-700">Rutinas Completadas</span>
+              <span class="text-lg font-bold text-gray-900">{{ client.completedRoutines }}</span>
+            </div>
+            
+            <div class="mt-4">
+              <div class="flex justify-between items-center text-sm mb-1">
+                <span class="font-medium text-gray-600">Ejercicios realizados</span>
+                <span class="font-bold text-green-600">{{ client.overallExercisePercentage }}%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2">
+                <div class="bg-green-500 h-2 rounded-full transition-all duration-500" [style.width.%]="client.overallExercisePercentage"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>

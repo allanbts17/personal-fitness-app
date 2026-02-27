@@ -8,6 +8,8 @@ export interface UserProfile {
     assignedInstructorId?: string;
     physicalData?: {
         weight: number;
+        weightUnit: 'lb' | 'kg';
+        height: number;
         bmi: number;
         lastUpdate: Date | any;
     };
@@ -54,6 +56,11 @@ export interface WorkoutLog {
     userId: string;
     routineId: string;
     date: Date | any;
-    duration?: number; // in minutes
+    duration?: number; // en minutos
     notes?: string;
+    // Progreso
+    completedExercisesCount?: number;
+    totalExercisesCount?: number;
+    // Feedback de la rutina
+    difficulty?: 'easy' | 'normal' | 'hard';
 }

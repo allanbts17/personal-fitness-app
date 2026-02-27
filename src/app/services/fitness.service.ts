@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { Exercise, Routine, Assignment, WorkoutLog } from '../models/fitness.models';
+import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../models/fitness.models';
 
 @Injectable({
     providedIn: 'root'
@@ -28,8 +28,8 @@ export class FitnessService {
     // ROUTINES
     getRoutinesByInstructor(instructorId: string): Observable<Routine[]> {
         const colRef = collection(this.firestore, 'routines');
-        const q = query(colRef, where('createdBy', '==', instructorId));
-        return collectionData(q, { idField: 'id' }) as Observable<Routine[]>;
+        // El usuario solicitó que todos los instructores vean todas las rutinas porque son de la misma persona.
+        return collectionData(colRef, { idField: 'id' }) as Observable<Routine[]>;
     }
 
     addRoutine(routine: Routine) {
@@ -67,7 +67,13 @@ export class FitnessService {
     }
 
     // USER PROFILE & PHYSICAL DATA
-    updatePhysicalData(userId: string, data: { weight: number, bmi: number }) {
+    getAllClients(): Observable<UserProfile[]> {
+        const colRef = collection(this.firestore, 'users');
+        const q = query(colRef, where('role', '==', 'user'));
+        return collectionData(q, { idField: 'uid' }) as Observable<UserProfile[]>;
+    }
+
+    updatePhysicalData(userId: string, data: { weight: number, weightUnit: 'kg' | 'lb', height: number, bmi: number }) {
         const docRef = doc(this.firestore, `users/${userId}`);
         return updateDoc(docRef, {
             physicalData: {
