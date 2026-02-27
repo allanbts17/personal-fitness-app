@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: ManageRoutinesPage
+  },  {
+    path: 'edit-exercise',
+    loadChildren: () => import('./edit-exercise/edit-exercise.module').then( m => m.EditExercisePageModule)
   }
+
 ];
 
 @NgModule({

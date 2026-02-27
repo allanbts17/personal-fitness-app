@@ -20,6 +20,11 @@ export class FitnessService {
         return addDoc(colRef, exercise);
     }
 
+    updateExercise(exerciseId: string, data: Partial<Exercise>) {
+        const docRef = doc(this.firestore, `exercises/${exerciseId}`);
+        return updateDoc(docRef, data);
+    }
+
     // ROUTINES
     getRoutinesByInstructor(instructorId: string): Observable<Routine[]> {
         const colRef = collection(this.firestore, 'routines');

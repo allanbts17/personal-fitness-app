@@ -3,8 +3,12 @@ import * as XLSX from 'xlsx';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController, LoadingController } from '@ionic/angular';
 import { ComponentsModule } from '../../../components/components.module';
+
+import { FitnessService } from '../../../services/fitness.service';
+import { Exercise, Routine } from '../../../models/fitness.models';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-manage-routines',
@@ -15,12 +19,39 @@ import { ComponentsModule } from '../../../components/components.module';
 })
 export class ManageRoutinesPage implements OnInit {
 
-  // Almacena el resultado final ya agrupado y con IDs
-  parsedRoutines: any[] = [];
+  // Almacena el resultado final ya agrupado
+  parsedRoutines: Routine[] = [];
+  parsedNewExercises: Exercise[] = [];
 
-  constructor() { }
+  existingRoutines: Routine[] = [];
+  existingExercises: Exercise[] = [];
+
+  instructorId: string = '';
+
+  constructor(
+    private fitnessService: FitnessService,
+    private authService: AuthService,
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController
+  ) { }
 
   ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.instructorId = user.uid;
+        this.loadData();
+      }
+    });
+  }
+
+  loadData() {
+    this.fitnessService.getExercises().subscribe(ex => {
+      this.existingExercises = ex;
+    });
+
+    this.fitnessService.getRoutinesByInstructor(this.instructorId).subscribe(routines => {
+      this.existingRoutines = routines;
+    });
   }
 
   // Se lanza cuando el usuario selecciona un archivo
@@ -31,79 +62,141 @@ export class ManageRoutinesPage implements OnInit {
     const reader: FileReader = new FileReader();
 
     reader.onload = (e: any) => {
-      // 1. Leer archivo
       const bstr: string = e.target.result;
       const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-
-      // 2. Obtener primera hoja
       const wsname: string = wb.SheetNames[0];
       const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-
-      // 3. Convertir a JSON
       const data = XLSX.utils.sheet_to_json(ws);
 
-      // 4. Procesar y agrupar rutinas
       this.processData(data);
     };
 
     reader.readAsBinaryString(file);
-
-    // Reseteamos el input para permitir subir el mismo archivo de nuevo
     event.target.value = '';
   }
 
-  // Ojo: El nombre de la columna en Excel debe coincidir exacto.
-  // En tu Excel de prueba son: Rutina, Orden, Ejercicio, Duracion_Segundos, Series, Descanso_Segundos
   processData(data: any[]) {
-    const routinesMap = new Map<string, any>();
+    const routinesMap = new Map<string, Routine>();
+    this.parsedNewExercises = []; // Reset new exercises
+    this.parsedRoutines = []; // Reset routines
 
     data.forEach(row => {
       const routineName = row['Rutina'];
-      if (!routineName) return; // Ignora filas en blanco o sin nombre
+      if (!routineName) return;
 
-      // Si no existe la rutina en el mapa, la creamos
       if (!routinesMap.has(routineName)) {
         routinesMap.set(routineName, {
-          id: this.generateId(routineName),
-          routineName: routineName,
-          totalDurationSeconds: 0, // Lo podrías calcular si quisieras
-          sessions: []
+          name: routineName,
+          createdBy: this.instructorId,
+          exercises: []
         });
       }
 
-      // Obtenemos la rutina y le agregamos la sesión de ejercicio
-      const routine = routinesMap.get(routineName);
+      const routine = routinesMap.get(routineName)!;
+
+      const rawExerciseName = row['Ejercicio'] || 'ejercicio';
+
+      // Validar si existe el ejercicio
+      let exerciseId = this.findExistingExerciseId(rawExerciseName);
+
+      if (!exerciseId) {
+        // Generamos un nuevo ID y lo preparamos para guardarlo si no existe
+        exerciseId = this.generateId(rawExerciseName);
+
+        // Evitar triplicados en memoria en la misma subida de Excel
+        if (!this.parsedNewExercises.find(ex => ex.id === exerciseId)) {
+          this.parsedNewExercises.push({
+            id: exerciseId,
+            name: rawExerciseName,
+            description: 'Importado de Excel',
+          });
+        }
+      }
 
       const session = {
         order: row['Orden'] || 1,
-        exerciseId: this.generateId(row['Ejercicio'] || 'ejercicio'), // Aquí crearíamos o enlazaríamos el ID
-        exerciseName: row['Ejercicio'],
+        exerciseId: exerciseId,
+        exerciseName: rawExerciseName,
         durationValue: row['Duracion_Segundos'] || row['Repeticiones'] || 0,
         sets: row['Series'] || 3,
         restSeconds: row['Descanso_Segundos'] || 0
       };
 
-      routine.sessions.push(session);
+      routine.exercises.push(session);
     });
 
-    // Convertimos el Map a Array para mostrarlo en el HTML
     this.parsedRoutines = Array.from(routinesMap.values());
-    console.log('Rutinas procesadas: ', this.parsedRoutines);
   }
 
-  // Genera un ID tomando el nombre, minúsculas, sin espacios/tildes, y 2 dígitos
-  generateId(name: string): string {
-    const cleanName = name
+  findExistingExerciseId(name: string): string | null {
+    const normalizedName = this.normalizeString(name);
+    const found = this.existingExercises.find(ex => this.normalizeString(ex.name) === normalizedName);
+    if (found && found.id) {
+      return found.id;
+    } // Note: Sometimes documents don't have id property if it's the document key, but usually idField takes care of it.
+
+    // Si ya lo ingresamos en el Excel dentro de las pasadas recientes, devolver ese mismo ID
+    const foundInNew = this.parsedNewExercises.find(ex => this.normalizeString(ex.name) === normalizedName);
+    if (foundInNew && foundInNew.id) {
+      return foundInNew.id;
+    }
+
+    return null;
+  }
+
+  normalizeString(str: string): string {
+    return str
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Quitar tildes
-      .replace(/\s+/g, ""); // Quitar espacios
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "");
+  }
 
-    const randomDigits = Math.floor(10 + Math.random() * 90); // 10 a 99
+  generateId(name: string): string {
+    const cleanName = this.normalizeString(name);
+    const randomDigits = Math.floor(10 + Math.random() * 90);
     return `${cleanName}${randomDigits}`;
+  }
+
+  async confirmarSubida() {
+    const loading = await this.loadingCtrl.create({
+      message: 'Guardando rutinas y ejercicios...'
+    });
+    await loading.present();
+
+    try {
+      // Guardar ejercicios nuevos
+      for (const ex of this.parsedNewExercises) {
+        await this.fitnessService.addExercise(ex);
+      }
+
+      // Guardar las rutinas
+      for (const routine of this.parsedRoutines) {
+        await this.fitnessService.addRoutine(routine);
+      }
+
+      loading.dismiss();
+      this.mostrarToast('Datos guardados correctamente', 'success');
+      this.clearData();
+
+    } catch (error) {
+      loading.dismiss();
+      console.error('Error al guardar datos', error);
+      this.mostrarToast('Error al guardar datos. Revisa la consola.', 'danger');
+    }
+  }
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 2500,
+      color: color
+    });
+    toast.present();
   }
 
   clearData() {
     this.parsedRoutines = [];
+    this.parsedNewExercises = [];
   }
 }

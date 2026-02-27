@@ -26,13 +26,17 @@ export interface Exercise {
 export interface Routine {
     id?: string;
     name: string;
-    description: string;
+    description?: string;
     createdBy: string;
     exercises: {
         exerciseId: string;
+        exerciseName?: string; // Cache the name from our previous strategy
         sets: number;
-        reps: string;
+        reps?: string;
         weight?: number;
+        durationValue?: number;
+        restSeconds?: number;
+        order?: number;
     }[];
 }
 

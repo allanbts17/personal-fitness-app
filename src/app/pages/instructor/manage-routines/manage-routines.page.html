@@ -1,9 +1,13 @@
-<app-header title="Gestión de Rutinas"></app-header>
+<app-header title="Gestión de Rutinas" [showBackButton]="true" defaultHref="/instructor/dashboard"></app-header>
 
 <ion-content class="ion-padding bg-gray-50">
   <div class="max-w-4xl mx-auto mt-8">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800">Rutinas</h1>
+      <ion-button routerLink="/instructor/manage-routines/edit-exercise" fill="clear" color="primary">
+        <ion-icon name="list-outline" slot="start"></ion-icon>
+        Ver Catálogo de Ejercicios
+      </ion-button>
     </div>
 
     <!-- Zona para arrastrar y soltar el archivo Excel -->
@@ -26,46 +30,105 @@
           class="hidden"
         >
         
-        <button 
+        <ion-button 
           (click)="fileInput.click()"
-          class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+          color="success"
+          shape="round">
           Seleccionar Archivo
-        </button>
+        </ion-button>
       </div>
     </div>
 
     <!-- Vista Previa de Ejercicios parseados -->
     <div *ngIf="parsedRoutines.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-gray-800">Vista Previa (JSON)</h2>
-        <button 
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">Vista Previa</h2>
+          <p class="text-sm text-gray-500 mt-1">Revisa que las rutinas y ejercicios sean correctos antes de guardar.</p>
+        </div>
+        <ion-button 
            (click)="clearData()"
-           class="text-sm text-red-600 hover:text-red-800 font-medium">Limpiar datos</button>
+           fill="outline"
+           color="danger"
+           size="small">
+           Cancelar
+        </ion-button>
       </div>
-      <p class="text-sm text-gray-500 mb-4">Estos son los objetos que se enviarían a Firestore agrupados por rutina.</p>
       
-      <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-        <pre class="text-green-400 text-xs font-mono">{{ parsedRoutines | json }}</pre>
+      <!-- Lista de Rutinas a Importar -->
+      <div class="space-y-6">
+        <div *ngFor="let routine of parsedRoutines" class="border border-gray-200 rounded-lg overflow-hidden">
+          <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+             <h3 class="font-bold text-gray-800">{{ routine.name }}</h3>
+             <span class="text-xs font-medium bg-blue-100 text-blue-800 py-1 px-2 rounded-full">{{ routine.exercises.length }} ejercicios</span>
+          </div>
+          <div class="divide-y divide-gray-100">
+             <div *ngFor="let session of routine.exercises" class="px-4 py-3 flex justify-between items-center bg-white hover:bg-gray-50">
+               <div class="flex items-center space-x-3">
+                 <span class="text-gray-400 font-mono text-xs w-6 text-center">{{ session.order }}</span>
+                 <span class="font-medium text-gray-700">{{ session.exerciseName }}</span>
+               </div>
+               <div class="text-sm text-gray-500 flex space-x-4">
+                 <span>{{ session.sets }} series</span>
+                 <span>{{ session.durationValue }} seg/reps</span>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nuevos Ejercicios detectados -->
+      <div *ngIf="parsedNewExercises.length > 0" class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h4 class="text-yellow-800 font-semibold mb-2 flex items-center">
+          <ion-icon name="warning-outline" class="mr-2 text-lg"></ion-icon>
+          Nuevos ejercicios detectados ({{parsedNewExercises.length}})
+        </h4>
+        <p class="text-sm text-yellow-700 mb-2">Se añadirán automáticamente al catálogo:</p>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let ex of parsedNewExercises" class="text-xs bg-white text-yellow-800 border border-yellow-300 px-2 py-1 rounded-full">
+            {{ ex.name }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Botón Confirmar -->
+      <div class="mt-8 flex justify-end">
+        <ion-button 
+          (click)="confirmarSubida()"
+          color="primary"
+          shape="round">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Confirmar y Guardar Todo
+        </ion-button>
       </div>
     </div>
 
-    <!-- Lista Placeholder de Rutinas Existentes -->
+    <!-- Lista de Rutinas Existentes -->
     <h2 class="text-xl font-bold text-gray-800 mb-4">Tus Rutinas Creadas</h2>
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 divide-y divide-gray-100">
+    
+    <div *ngIf="existingRoutines.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
+      <div class="text-gray-400 mb-3">
+        <ion-icon name="document-text-outline" class="text-5xl"></ion-icon>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900">No hay rutinas</h3>
+      <p class="text-gray-500 mt-1">Aún no has creado ni subido ninguna rutina.</p>
+    </div>
+
+    <div *ngIf="existingRoutines.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-100 divide-y divide-gray-100">
       
-      <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+      <div *ngFor="let routine of existingRoutines" class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
         <div class="flex items-center space-x-4">
-          <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center text-purple-600 font-bold">
-            FB
+          <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center text-purple-600 font-bold uppercase">
+            {{ routine.name.substring(0, 2) }}
           </div>
           <div>
-            <h3 class="text-md font-semibold text-gray-800">Full Body A</h3>
-            <p class="text-xs text-gray-500">10 ejercicios • 20 mins</p>
+            <h3 class="text-md font-semibold text-gray-800">{{ routine.name }}</h3>
+            <p class="text-xs text-gray-500">{{ routine.exercises.length || 0 }} ejercicios</p> <!-- Ajustamos caso de undefined -->
           </div>
         </div>
-        <button class="text-gray-400 hover:text-purple-600">
-          <ion-icon name="chevron-forward-outline" class="text-xl"></ion-icon>
-        </button>
+        <ion-button fill="clear" color="medium">
+          <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
+        </ion-button>
       </div>
 
     </div>
