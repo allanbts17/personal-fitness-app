@@ -1,8 +1,4 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-title>Panel del Instructor</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Panel del Instructor"></app-header>
 
 <ion-content class="ion-padding bg-gray-50">
   <div class="max-w-4xl mx-auto mt-8">
@@ -39,7 +35,9 @@
       </div>
 
       <!-- Ejercicios -->
-      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
+      <div 
+        routerLink="/instructor/manage-routines"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
         <div class="flex items-center space-x-4">
           <div class="bg-green-100 p-3 rounded-full text-green-600">
             <ion-icon name="barbell" class="text-2xl"></ion-icon>

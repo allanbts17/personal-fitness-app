@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
 
+
 @Component({
   selector: 'app-user-home',
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
-        <ion-title>Mi Fitness</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <app-header title="Mi Fitness"></app-header>
     <ion-content class="ion-padding bg-gray-50">
       <div class="max-w-4xl mx-auto mt-8">
         <div class="bg-material-blue text-white p-6 rounded-2xl shadow-lg mb-8">
@@ -38,3 +35,4 @@ import { Component } from '@angular/core';
   standalone: false
 })
 export class UserHomePage { }
+

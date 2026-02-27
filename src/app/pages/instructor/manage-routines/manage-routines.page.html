@@ -1,0 +1,75 @@
+<app-header title="Gestión de Rutinas"></app-header>
+
+<ion-content class="ion-padding bg-gray-50">
+  <div class="max-w-4xl mx-auto mt-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Rutinas</h1>
+    </div>
+
+    <!-- Zona para arrastrar y soltar el archivo Excel -->
+    <div class="bg-white p-8 rounded-lg border-2 border-dashed border-gray-300 text-center hover:bg-gray-50 transition-colors mb-8">
+      <div class="flex flex-col items-center justify-center space-y-4">
+        <div class="bg-green-100 p-4 rounded-full text-green-600">
+           <ion-icon name="cloud-upload-outline" class="text-4xl"></ion-icon>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold text-gray-700">Sube tus rutinas desde Excel</h3>
+          <p class="text-sm text-gray-500 mt-1">Arrastra tu archivo .xlsx o .csv aquí o haz clic para seleccionar</p>
+        </div>
+        
+        <!-- Input escondido -->
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          class="hidden"
+        >
+        
+        <button 
+          (click)="fileInput.click()"
+          class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+          Seleccionar Archivo
+        </button>
+      </div>
+    </div>
+
+    <!-- Vista Previa de Ejercicios parseados -->
+    <div *ngIf="parsedRoutines.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Vista Previa (JSON)</h2>
+        <button 
+           (click)="clearData()"
+           class="text-sm text-red-600 hover:text-red-800 font-medium">Limpiar datos</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-4">Estos son los objetos que se enviarían a Firestore agrupados por rutina.</p>
+      
+      <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+        <pre class="text-green-400 text-xs font-mono">{{ parsedRoutines | json }}</pre>
+      </div>
+    </div>
+
+    <!-- Lista Placeholder de Rutinas Existentes -->
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Tus Rutinas Creadas</h2>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 divide-y divide-gray-100">
+      
+      <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+        <div class="flex items-center space-x-4">
+          <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center text-purple-600 font-bold">
+            FB
+          </div>
+          <div>
+            <h3 class="text-md font-semibold text-gray-800">Full Body A</h3>
+            <p class="text-xs text-gray-500">10 ejercicios • 20 mins</p>
+          </div>
+        </div>
+        <button class="text-gray-400 hover:text-purple-600">
+          <ion-icon name="chevron-forward-outline" class="text-xl"></ion-icon>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>
+

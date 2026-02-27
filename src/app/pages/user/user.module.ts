@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { UserHomePage } from './home.page';
+import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({
     imports: [
         CommonModule,
         IonicModule,
+        ComponentsModule,
         RouterModule.forChild([{ path: 'home', component: UserHomePage }])
     ],
     declarations: [UserHomePage],

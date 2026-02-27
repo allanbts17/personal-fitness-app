@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
 
+
 @Component({
   selector: 'app-admin-dashboard',
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
-        <ion-title>Panel de Administración</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <app-header title="Panel de Administración"></app-header>
     <ion-content class="ion-padding bg-gray-50">
       <div class="max-w-4xl mx-auto mt-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">Bienvenido, Administrador</h1>
@@ -33,3 +30,4 @@ import { Component } from '@angular/core';
   standalone: false
 })
 export class AdminDashboardPage { }
+
