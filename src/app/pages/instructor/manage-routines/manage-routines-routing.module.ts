@@ -7,9 +7,14 @@ const routes: Routes = [
   {
     path: '',
     component: ManageRoutinesPage
-  },  {
+  },
+  {
     path: 'edit-exercise',
-    loadChildren: () => import('./edit-exercise/edit-exercise.module').then( m => m.EditExercisePageModule)
+    loadChildren: () => import('./edit-exercise/edit-exercise.module').then(m => m.EditExercisePageModule)
+  },
+  {
+    path: 'edit-routine/:id',
+    loadChildren: () => import('./edit-routine/edit-routine.module').then(m => m.EditRoutinePageModule)
   }
 
 ];
@@ -18,4 +23,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ManageRoutinesPageRoutingModule {}
+export class ManageRoutinesPageRoutingModule { }

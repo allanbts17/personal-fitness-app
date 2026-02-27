@@ -10,12 +10,14 @@ import { FitnessService } from '../../../services/fitness.service';
 import { Exercise, Routine } from '../../../models/fitness.models';
 import { AuthService } from '../../../services/auth.service';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-manage-routines',
   templateUrl: './manage-routines.page.html',
   styleUrls: ['./manage-routines.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, ComponentsModule]
+  imports: [CommonModule, FormsModule, IonicModule, ComponentsModule, RouterModule]
 })
 export class ManageRoutinesPage implements OnInit {
 

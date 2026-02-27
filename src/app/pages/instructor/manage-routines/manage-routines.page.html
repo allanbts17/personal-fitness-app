@@ -116,7 +116,9 @@
 
     <div *ngIf="existingRoutines.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-100 divide-y divide-gray-100">
       
-      <div *ngFor="let routine of existingRoutines" class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+      <div *ngFor="let routine of existingRoutines" 
+           [routerLink]="['/instructor/manage-routines/edit-routine', routine.id]"
+           class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
         <div class="flex items-center space-x-4">
           <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center text-purple-600 font-bold uppercase">
             {{ routine.name.substring(0, 2) }}

@@ -37,6 +37,16 @@ export class FitnessService {
         return addDoc(colRef, routine);
     }
 
+    getRoutineById(routineId: string): Observable<Routine | undefined> {
+        const docRef = doc(this.firestore, `routines/${routineId}`);
+        return docData(docRef, { idField: 'id' }) as Observable<Routine | undefined>;
+    }
+
+    updateRoutine(routineId: string, data: Partial<Routine>) {
+        const docRef = doc(this.firestore, `routines/${routineId}`);
+        return updateDoc(docRef, data);
+    }
+
     // ASSIGNMENTS
     getUserAssignments(userId: string): Observable<Assignment[]> {
         const colRef = collection(this.firestore, 'assignments');
