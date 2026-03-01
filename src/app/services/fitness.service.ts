@@ -67,7 +67,7 @@ export class FitnessService {
     }
 
     // USER PROFILE & PHYSICAL DATA
-    getAllClients(): Observable<UserProfile[]> {
+    getAllStudents(): Observable<UserProfile[]> {
         const colRef = collection(this.firestore, 'users');
         const q = query(colRef, where('role', '==', 'user'));
         return collectionData(q, { idField: 'uid' }) as Observable<UserProfile[]>;

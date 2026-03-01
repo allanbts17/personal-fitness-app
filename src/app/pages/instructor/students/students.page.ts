@@ -3,39 +3,36 @@ import { FitnessService } from 'src/app/services/fitness.service';
 import { UserProfile, WorkoutLog } from 'src/app/models/fitness.models';
 import { firstValueFrom } from 'rxjs';
 
-interface ClientProgress extends UserProfile {
+interface StudentProgress extends UserProfile {
   completedRoutines: number;
   overallExercisePercentage: number;
 }
 
 @Component({
-  selector: 'app-clients',
-  templateUrl: './clients.page.html',
-  styleUrls: ['./clients.page.scss'],
+  selector: 'app-students',
+  templateUrl: './students.page.html',
+  styleUrls: ['./students.page.scss'],
   standalone: false
 })
-export class ClientsPage implements OnInit {
-  clients: ClientProgress[] = [];
+export class StudentsPage implements OnInit {
+  students: StudentProgress[] = [];
   isLoading: boolean = true;
 
   constructor(private fitnessService: FitnessService) { }
 
   ngOnInit() {
-    this.loadClients();
+    this.loadStudents();
   }
 
-  async loadClients() {
+  async loadStudents() {
     this.isLoading = true;
     try {
-      const users = await firstValueFrom(this.fitnessService.getAllClients());
+      const users = await firstValueFrom(this.fitnessService.getAllStudents());
 
-      const clientsWithProgress = await Promise.all(users.map(async (user) => {
+      const studentsWithProgress = await Promise.all(users.map(async (user) => {
         const logs = await firstValueFrom(this.fitnessService.getUserLogs(user.uid));
 
-        // Calcular rutinas completadas
         const completedRoutines = logs.length;
-
-        // Calcular porcentaje global de ejercicios completados
         let totalAssigned = 0;
         let totalCompleted = 0;
 
@@ -58,12 +55,11 @@ export class ClientsPage implements OnInit {
         };
       }));
 
-      this.clients = clientsWithProgress;
+      this.students = studentsWithProgress;
     } catch (error) {
-      console.error('Error loading clients:', error);
+      console.error('Error loading students:', error);
     } finally {
       this.isLoading = false;
     }
   }
-
 }

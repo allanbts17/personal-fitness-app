@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
             <p class="text-3xl font-bold mt-2">12</p>
           </div>
           <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 class="text-lg font-semibold text-material-blue">Clientes</h3>
+            <h3 class="text-lg font-semibold text-material-blue">Estudiantes</h3>
             <p class="text-3xl font-bold mt-2">45</p>
           </div>
         </div>

@@ -29,15 +29,7 @@ const routes: Routes = [
         loadChildren: () => import('./pages/user/user.module').then(m => m.UserPageModule),
         //canActivate: [RoleGuard],
         data: { roles: ['user'] }
-    },  {
-    path: 'manage-routines',
-    loadChildren: () => import('./pages/instructor/manage-routines/manage-routines.module').then( m => m.ManageRoutinesPageModule)
-  },
-  {
-    path: 'clients',
-    loadChildren: () => import('./pages/instructor/clients/clients.module').then( m => m.ClientsPageModule)
-  },
-
+    }
 ];
 
 @NgModule({

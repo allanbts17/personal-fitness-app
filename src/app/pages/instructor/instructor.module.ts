@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { InstructorDashboardPage } from './dashboard.page';
-import { RegisterClientsPage } from './register-clients/register-clients.page';
+import { RegisterStudentsPage } from './register-students/register-students.page';
 import { FormsModule } from '@angular/forms';
 import { ComponentsModule } from '../../components/components.module';
 
@@ -23,12 +23,12 @@ import { ComponentsModule } from '../../components/components.module';
                 loadChildren: () => import('./manage-routines/manage-routines.module').then(m => m.ManageRoutinesPageModule)
             },
             {
-                path: 'register-clients',
-                component: RegisterClientsPage
+                path: 'register-students',
+                component: RegisterStudentsPage
             },
             {
-                path: 'clients',
-                loadChildren: () => import('./clients/clients.module').then(m => m.ClientsPageModule)
+                path: 'students',
+                loadChildren: () => import('./students/students.module').then(m => m.StudentsPageModule)
             },
             {
                 path: '',
@@ -37,7 +37,7 @@ import { ComponentsModule } from '../../components/components.module';
             }
         ])
     ],
-    declarations: [InstructorDashboardPage, RegisterClientsPage],
+    declarations: [InstructorDashboardPage, RegisterStudentsPage],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class InstructorPageModule { }
