@@ -18,16 +18,41 @@ export class StudentsPage implements OnInit {
   students: StudentProgress[] = [];
   isLoading: boolean = true;
 
+  searchTerm: string = '';
+  selectedGroup: number | 'all' = 'all';
+  availableGroups: number[] = [];
+
   constructor(private fitnessService: FitnessService) { }
 
   ngOnInit() {
     this.loadStudents();
   }
 
+  get filteredStudents() {
+    return this.students.filter(student => {
+      const name = student.displayName || `${student.name || ''} ${student.lastname || ''}`.trim();
+      const matchesSearch = name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const matchesGroup = this.selectedGroup === 'all' || student.group === this.selectedGroup;
+
+      return matchesSearch && matchesGroup;
+    });
+  }
+
   async loadStudents() {
     this.isLoading = true;
     try {
       const users = await firstValueFrom(this.fitnessService.getAllStudents());
+
+      // Extract unique groups
+      const groups = new Set<number>();
+      users.forEach((user: any) => {
+        if (user.group !== undefined && user.group !== null) {
+          groups.add(user.group);
+        }
+      });
+      this.availableGroups = Array.from(groups).sort((a, b) => a - b);
 
       const studentsWithProgress = await Promise.all(users.map(async (user) => {
         const logs = await firstValueFrom(this.fitnessService.getUserLogs(user.uid));

@@ -5,6 +5,9 @@ export interface UserProfile {
     email: string;
     displayName: string;
     role: UserRole;
+    name?: string;
+    lastname?: string;
+    group?: number;
     assignedInstructorId?: string;
     physicalData?: {
         weight: number;

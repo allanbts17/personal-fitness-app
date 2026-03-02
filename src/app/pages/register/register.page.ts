@@ -126,6 +126,58 @@ export class RegisterPage implements OnInit {
     }
   }
 
+  async generateFakeStudents() {
+    this.isLoading = true;
+    this.showToast('Generando estudiantes temporales, por favor espera...', 'warning');
+
+    const domain = this.config?.email?.validDomain || 'colegioadventistach.org';
+    const { doc, setDoc } = await import('@angular/fire/firestore');
+    let totalGenerated = 0;
+
+    try {
+      // 15 para curso 5
+      for (let i = 1; i <= 15; i++) {
+        const email = `estudiante${i}.grupo5@${domain}`;
+        const userCredential = await this.auth.register(email, '123456');
+        const docRef = doc(this.firestore, `users/${userCredential.user.uid}`);
+        await setDoc(docRef, {
+          uid: userCredential.user.uid,
+          email: email,
+          role: 'user',
+          group: 5,
+          name: `Estudiante${i}`,
+          lastname: 'Grupo5',
+          displayName: `Estudiante${i} Grupo5`
+        });
+        totalGenerated++;
+      }
+
+      // 10 para curso 6
+      for (let i = 1; i <= 10; i++) {
+        const email = `estudiante${i}.grupo6@${domain}`;
+        const userCredential = await this.auth.register(email, '123456');
+        const docRef = doc(this.firestore, `users/${userCredential.user.uid}`);
+        await setDoc(docRef, {
+          uid: userCredential.user.uid,
+          email: email,
+          role: 'user',
+          group: 6,
+          name: `Estudiante${i}`,
+          lastname: 'Grupo6',
+          displayName: `Estudiante${i} Grupo6`
+        });
+        totalGenerated++;
+      }
+
+      this.showToast(`Se han creado ${totalGenerated} estudiantes exitosamente.`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      this.showToast('Error generando estudiantes: ' + err.message, 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   async showToast(message: string, color: 'success' | 'warning' | 'danger') {
     const toast = await this.toastCtrl.create({
       message,

@@ -37,3 +37,13 @@ body {
     --background: transparent;
   }
 }
+
+ion-input, ion-select {
+  --color: #1f2937;
+  //--placeholder-color: #9ca3af;
+  --padding-bottom: 8px;
+  --highlight-color-focused: #1976D2;
+  --highlight-color-valid: #1976D2;
+  --highlight-color-invalid: #1976D2;
+  font-size: 14px;
+}

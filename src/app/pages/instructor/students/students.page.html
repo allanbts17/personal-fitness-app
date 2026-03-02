@@ -3,6 +3,25 @@
 <ion-content class="bg-gray-50 ion-padding">
   <div class="max-w-4xl mx-auto mt-4">
 
+    <!-- Filters -->
+    <div *ngIf="!isLoading && students.length > 0" class="flex flex-col md:flex-row gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+      <div class="flex-1">
+        <ion-searchbar 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar por nombre o correo" 
+          animated="true"
+          class="p-0 custom-searchbar">
+        </ion-searchbar>
+      </div>
+      <div class="md:w-64 flex items-center bg-gray-50 rounded-xl px-3 border border-gray-200">
+        <ion-icon name="business-outline" class="text-gray-500 mr-2"></ion-icon>
+        <ion-select [(ngModel)]="selectedGroup" interface="popover" placeholder="Curso" class="w-full">
+          <ion-select-option value="all">Todos los Cursos</ion-select-option>
+          <ion-select-option *ngFor="let group of availableGroups" [value]="group">Curso: {{ group }}</ion-select-option>
+        </ion-select>
+      </div>
+    </div>
+
     <!-- Cargando -->
     <div *ngIf="isLoading" class="flex justify-center mt-10">
       <ion-spinner name="crescent" color="primary"></ion-spinner>
@@ -15,9 +34,16 @@
       <p>Aún no hay estudiantes registrados en el sistema.</p>
     </div>
 
+    <!-- Sin Resultados -->
+    <div *ngIf="!isLoading && students.length > 0 && filteredStudents.length === 0" class="text-center mt-16 text-gray-500">
+      <ion-icon name="search-outline" class="text-6xl mb-4 text-gray-300"></ion-icon>
+      <h2 class="text-xl font-bold">Sin resultados</h2>
+      <p>No se encontraron estudiantes que coincidan con los filtros.</p>
+    </div>
+
     <!-- Lista de Estudiantes -->
-    <div *ngIf="!isLoading && students.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div *ngFor="let student of students" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div *ngIf="!isLoading && filteredStudents.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngFor="let student of filteredStudents" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         
         <!-- Encabezado Estudiante -->
         <div class="p-5 border-b border-gray-50 flex items-center space-x-4">

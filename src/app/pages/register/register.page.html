@@ -73,8 +73,16 @@
       <!-- Register Button -->
       <ion-button (click)="register()" 
               [disabled]="isLoading || !config"
-              class="w-full text-white py-3 rounded font-medium uppercase text-sm mt-8 mb-4">
+              class="w-full text-white py-3 rounded font-medium uppercase text-sm mt-8 mb-2">
         Crear Cuenta
+      </ion-button>
+
+      <!-- Temporary Generate Button -->
+      <ion-button (click)="generateFakeStudents()" 
+              color="medium" fill="outline"
+              [disabled]="isLoading || !config"
+              class="w-full py-2 rounded font-medium uppercase text-xs mb-4">
+        Generar Estudiantes (Temp)
       </ion-button>
 
       <!-- Footer -->
