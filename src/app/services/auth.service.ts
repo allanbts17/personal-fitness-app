@@ -25,6 +25,10 @@ export class AuthService {
         return signInWithEmailAndPassword(this.auth, email, pass);
     }
 
+    async register(email: string, pass: string) {
+        return createUserWithEmailAndPassword(this.auth, email, pass);
+    }
+
     async logout() {
         return signOut(this.auth);
     }

@@ -1,0 +1,89 @@
+<ion-content class="bg-gray-100">
+  <div class="min-h-full flex flex-col justify-center items-center p-4">
+    <!-- Main Card -->
+    <div class="w-full max-w-[400px] bg-white rounded-lg shadow-material p-8 transition-all relative">
+      
+      <!-- Back button -->
+      <ion-button routerLink="/login" fill="clear" color="dark" class="absolute top-2 left-2">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+
+      <!-- Icon/Avatar -->
+      <div class="flex justify-center mb-4 mt-2">
+        <div class="w-16 h-16 bg-material-blue rounded-full flex items-center justify-center shadow-lg">
+          <ion-icon name="person-add" class="text-white text-3xl"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-medium text-gray-800 m-0">Registrarse</h1>
+        <p class="text-sm text-gray-500 mt-1">Crea tu cuenta de estudiante</p>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="space-y-3">
+        <ion-item lines="none" class="input-item">
+          <ion-input
+            type="email"
+            [(ngModel)]="email"
+            label="Correo electrónico"
+            label-placement="floating"
+            placeholder="estudiante@colegioadventistach.org"
+            autocomplete="email"
+          ></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-input
+            color="primary"
+            type="password"
+            [(ngModel)]="password"
+            label="Contraseña"
+            label-placement="floating"
+            placeholder="••••••••"
+            [type]="showPassword ? 'text' : 'password'"
+          ></ion-input>
+          <ion-button slot="end" fill="clear" class="eye-btn" (click)="showPassword = !showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="text-gray-400"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-select
+            label="Selecciona tu Grupo"
+            label-placement="floating"
+            [(ngModel)]="selectedGroup"
+            interface="action-sheet"
+            placeholder="Escoge un curso"
+            [disabled]="availableGroups.length === 0"
+          >
+            <ion-select-option *ngFor="let group of availableGroups" [value]="group">
+              Curso: {{ group }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex justify-center my-4">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
+
+      <!-- Register Button -->
+      <ion-button (click)="register()" 
+              [disabled]="isLoading || !config"
+              class="w-full text-white py-3 rounded font-medium uppercase text-sm mt-8 mb-4">
+        Crear Cuenta
+      </ion-button>
+
+      <!-- Footer -->
+      <div class="text-center mt-6">
+        <p class="text-sm text-gray-600">
+          ¿Ya tienes cuenta? <a routerLink="/login" class="text-material-blue font-medium hover:underline cursor-pointer">Inicia sesión</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</ion-content>
