@@ -36,8 +36,8 @@ export interface Routine {
     exercises: {
         exerciseId: string;
         exerciseName?: string; // Cache the name from our previous strategy
-        sets: number;
-        reps?: string;
+        sets?: number;
+        reps?: string | number;
         weight?: number;
         durationValue?: number;
         restSeconds?: number;

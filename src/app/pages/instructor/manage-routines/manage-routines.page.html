@@ -69,8 +69,8 @@
                  <span class="font-medium text-gray-700">{{ session.exerciseName }}</span>
                </div>
                <div class="text-sm text-gray-500 flex space-x-4">
-                 <span>{{ session.sets }} series</span>
-                 <span>{{ session.durationValue }} seg/reps</span>
+                 <span *ngIf="session.durationValue">{{ session.durationValue }} seg</span>
+                 <span *ngIf="session.reps">{{ session.reps }} reps max</span>
                </div>
              </div>
           </div>
@@ -128,9 +128,14 @@
             <p class="text-xs text-gray-500">{{ routine.exercises.length || 0 }} ejercicios</p> <!-- Ajustamos caso de undefined -->
           </div>
         </div>
-        <ion-button fill="clear" color="medium">
-          <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
-        </ion-button>
+        <div class="flex items-center space-x-2">
+          <ion-button fill="clear" color="danger" (click)="confirmarBorrado(routine, $event)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="medium">
+            <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
       </div>
 
     </div>

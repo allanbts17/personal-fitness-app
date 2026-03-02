@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, LoadingController } from '@ionic/angular';
+import { IonicModule, ToastController, LoadingController, AlertController } from '@ionic/angular';
 import { ComponentsModule } from '../../../components/components.module';
 
 import { FitnessService } from '../../../services/fitness.service';
@@ -34,7 +34,8 @@ export class ManageRoutinesPage implements OnInit {
     private fitnessService: FitnessService,
     private authService: AuthService,
     private toastCtrl: ToastController,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController
   ) { }
 
   ngOnInit() {
@@ -44,6 +45,43 @@ export class ManageRoutinesPage implements OnInit {
         this.loadData();
       }
     });
+  }
+
+  async confirmarBorrado(routine: Routine, event: Event) {
+    event.stopPropagation();
+
+    if (!routine.id) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmar Eliminación',
+      message: `¿Estás seguro que deseas eliminar la rutina "${routine.name}"? Esta acción no se puede deshacer.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        }, {
+          text: 'Eliminar',
+          cssClass: 'danger',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+            await loading.present();
+            try {
+              await this.fitnessService.deleteRoutine(routine.id!);
+              loading.dismiss();
+              this.mostrarToast('Rutina eliminada correctamente', 'success');
+              // The routines list should update automatically if it's connected to Firestore real-time.
+            } catch (error) {
+              loading.dismiss();
+              console.error('Error deleting routine:', error);
+              this.mostrarToast('Error al eliminar la rutina', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   loadData() {
@@ -119,8 +157,8 @@ export class ManageRoutinesPage implements OnInit {
         order: row['Orden'] || 1,
         exerciseId: exerciseId,
         exerciseName: rawExerciseName,
-        durationValue: row['Duracion_Segundos'] || row['Repeticiones'] || 0,
-        sets: row['Series'] || 3,
+        durationValue: row['Duracion_Segundos'] || 0,
+        reps: row['Max_Rep'] || 0,
         restSeconds: row['Descanso_Segundos'] || 0
       };
 

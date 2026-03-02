@@ -47,6 +47,11 @@ export class FitnessService {
         return updateDoc(docRef, data);
     }
 
+    deleteRoutine(routineId: string) {
+        const docRef = doc(this.firestore, `routines/${routineId}`);
+        return deleteDoc(docRef);
+    }
+
     // ASSIGNMENTS
     getUserAssignments(userId: string): Observable<Assignment[]> {
         const colRef = collection(this.firestore, 'assignments');
