@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ComponentsModule } from '../../../../components/components.module';
 
 import { FitnessService } from '../../../../services/fitness.service';
-import { Routine } from '../../../../models/fitness.models';
+import { Routine, UserProfile } from '../../../../models/fitness.models';
 import { ItemReorderEventDetail } from '@ionic/angular';
 
 @Component({
@@ -20,6 +20,8 @@ export class EditRoutinePage implements OnInit {
 
   routineId: string = '';
   routine: Routine | null = null;
+  availableGroups: number[] = [];
+  students: UserProfile[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -33,9 +35,21 @@ export class EditRoutinePage implements OnInit {
     this.routineId = this.route.snapshot.paramMap.get('id') || '';
     if (this.routineId) {
       this.loadRoutine();
+      this.loadGroups();
     } else {
       this.router.navigate(['/instructor/manage-routines']);
     }
+  }
+
+  loadGroups() {
+    this.fitnessService.getAllStudents().subscribe(users => {
+      this.students = users;
+      const groups = new Set<number>();
+      users.forEach(u => {
+        if (u.group) groups.add(u.group);
+      });
+      this.availableGroups = Array.from(groups).sort((a, b) => a - b);
+    });
   }
 
   loadRoutine() {
@@ -97,8 +111,22 @@ export class EditRoutinePage implements OnInit {
     try {
       await this.fitnessService.updateRoutine(this.routineId, {
         name: this.routine.name.trim(),
-        exercises: this.routine.exercises
+        exercises: this.routine.exercises,
+        assignedGroups: this.routine.assignedGroups || []
       });
+
+      // Assign to users in new groups
+      const currentGroups = this.routine.assignedGroups || [];
+      console.log('New groups:', currentGroups);
+      console.log('Students:', this.students);
+
+      for (const group of currentGroups) {
+        const usersInGroup = this.students.filter(u => u.group === group);
+        console.log('Users in group:', usersInGroup);
+        for (const user of usersInGroup) {
+          await this.fitnessService.assignRoutineToUser(user.uid, this.routineId);
+        }
+      }
 
       loading.dismiss();
       this.mostrarToast('Rutina actualizada correctamente', 'success');

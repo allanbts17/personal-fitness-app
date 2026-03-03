@@ -8,8 +8,23 @@
       <ion-input
         type="text"
         [(ngModel)]="routine.name"
-        class="bg-gray-50 border border-gray-200 rounded-lg px-4 font-bold text-xl"
+        class="bg-gray-50 border border-gray-200 rounded-lg px-4 font-bold text-xl mb-4"
       ></ion-input>
+
+      <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">Asignar a Grupos</label>
+      <ion-select
+        multiple="true"
+        cancelText="Cancelar"
+        okText="Aceptar"
+        placeholder="Seleccionar grupos"
+        [(ngModel)]="routine.assignedGroups"
+        class="bg-gray-50 border border-gray-200 rounded-lg px-4 w-full"
+      >
+        <ion-select-option *ngFor="let group of availableGroups" [value]="group">
+          Grupo {{ group }}
+        </ion-select-option>
+      </ion-select>
+      <p class="text-xs text-gray-500 mt-2">Al guardar, la rutina se asignará a todos los estudiantes de los grupos seleccionados.</p>
     </div>
 
     <!-- Lista regida por Reorder -->
@@ -44,7 +59,7 @@
             </div>
 
             <div class="flex items-center bg-gray-100 rounded-lg px-2 py-1">
-              <span class="text-xs text-gray-500 mr-2">Segs/Reps:</span>
+              <span class="text-xs text-gray-500 mr-2">Duración:</span>
               <ion-input type="number" [(ngModel)]="session.durationValue" class="w-16 text-center text-sm font-bold bg-white rounded border border-gray-200"></ion-input>
             </div>
             

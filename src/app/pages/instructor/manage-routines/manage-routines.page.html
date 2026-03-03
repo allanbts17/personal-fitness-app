@@ -126,6 +126,9 @@
           <div>
             <h3 class="text-md font-semibold text-gray-800">{{ routine.name }}</h3>
             <p class="text-xs text-gray-500">{{ routine.exercises.length || 0 }} ejercicios</p> <!-- Ajustamos caso de undefined -->
+            <p *ngIf="routine.assignedGroups && routine.assignedGroups.length > 0" class="text-xs text-blue-600 font-medium mt-1">
+              Asignada a: {{ formatGroups(routine.assignedGroups) }}
+            </p>
           </div>
         </div>
         <div class="flex items-center space-x-2">

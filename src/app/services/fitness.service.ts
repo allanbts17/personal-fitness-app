@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../models/fitness.models';
 
@@ -53,6 +53,11 @@ export class FitnessService {
     }
 
     // ASSIGNMENTS
+    assignRoutine(assignment: Assignment) {
+        const colRef = collection(this.firestore, 'assignments');
+        return addDoc(colRef, assignment);
+    }
+
     getUserAssignments(userId: string): Observable<Assignment[]> {
         const colRef = collection(this.firestore, 'assignments');
         const q = query(colRef, where('userId', '==', userId), where('status', '==', 'active'));
@@ -86,5 +91,10 @@ export class FitnessService {
                 lastUpdate: new Date()
             }
         });
+    }
+
+    assignRoutineToUser(userId: string, routineId: string) {
+        const docRef = doc(this.firestore, `users/${userId}`);
+        return updateDoc(docRef, { assignedRoutineIds: arrayUnion(routineId) });
     }
 }

@@ -239,4 +239,8 @@ export class ManageRoutinesPage implements OnInit {
     this.parsedRoutines = [];
     this.parsedNewExercises = [];
   }
+
+  formatGroups(groups: number[]): string {
+    return groups.map(g => `Grupo ${g}`).join(', ');
+  }
 }

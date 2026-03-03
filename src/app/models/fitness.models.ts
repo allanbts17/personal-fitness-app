@@ -16,6 +16,7 @@ export interface UserProfile {
         bmi: number;
         lastUpdate: Date | any;
     };
+    assignedRoutineIds?: string[];
 }
 
 export interface Exercise {
@@ -43,6 +44,7 @@ export interface Routine {
         restSeconds?: number;
         order?: number;
     }[];
+    assignedGroups?: number[];
 }
 
 export interface Assignment {
