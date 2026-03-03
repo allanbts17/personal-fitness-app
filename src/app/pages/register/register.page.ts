@@ -105,6 +105,13 @@ export class RegisterPage implements OnInit {
       const { doc, setDoc } = await import('@angular/fire/firestore');
       const docRef = doc(this.firestore, `users/${userCredential.user.uid}`);
 
+      // Fetch routines assigned to this group
+      const routinesQuery = query(collection(this.firestore, 'routines'), where('assignedGroups', 'array-contains', this.selectedGroup));
+      const routinesSnapshot = await getDocs(routinesQuery);
+      console.log("routines snapshot:", routinesSnapshot);
+      const assignedRoutineIds = routinesSnapshot.docs.map(d => d.id);
+      console.log("assignedRoutineIds:", assignedRoutineIds);
+
       await setDoc(docRef, {
         uid: userCredential.user.uid,
         email: emailLower,
@@ -112,17 +119,20 @@ export class RegisterPage implements OnInit {
         group: this.selectedGroup,
         name: name,
         lastname: lastname,
-        displayName: `${name} ${lastname}`.trim()
+        displayName: `${name} ${lastname}`.trim(),
+        assignedRoutineIds: assignedRoutineIds
       });
 
       this.showToast('Cuenta creada con éxito. Iniciando sesión...', 'success');
-      this.router.navigate(['/user/home']);
+      setTimeout(() => {
+        this.isLoading = false;
+        this.router.navigate(['/user/home']);
+      }, 500);
 
     } catch (err: any) {
       console.error(err);
-      this.showToast('Error al registrar: ' + err.message, 'danger');
-    } finally {
       this.isLoading = false;
+      this.showToast('Error al registrar: ' + err.message, 'danger');
     }
   }
 
@@ -135,6 +145,15 @@ export class RegisterPage implements OnInit {
     let totalGenerated = 0;
 
     try {
+      // Pre-fetch routines assigned to group 5 and 6
+      const q5 = query(collection(this.firestore, 'routines'), where('assignedGroups', 'array-contains', 5));
+      const snap5 = await getDocs(q5);
+      const routineIds5 = snap5.docs.map(d => d.id);
+
+      const q6 = query(collection(this.firestore, 'routines'), where('assignedGroups', 'array-contains', 6));
+      const snap6 = await getDocs(q6);
+      const routineIds6 = snap6.docs.map(d => d.id);
+
       // 15 para curso 5
       for (let i = 1; i <= 15; i++) {
         const email = `estudiante${i}.grupo5@${domain}`;
@@ -147,7 +166,8 @@ export class RegisterPage implements OnInit {
           group: 5,
           name: `Estudiante${i}`,
           lastname: 'Grupo5',
-          displayName: `Estudiante${i} Grupo5`
+          displayName: `Estudiante${i} Grupo5`,
+          assignedRoutineIds: routineIds5
         });
         totalGenerated++;
       }
@@ -164,7 +184,8 @@ export class RegisterPage implements OnInit {
           group: 6,
           name: `Estudiante${i}`,
           lastname: 'Grupo6',
-          displayName: `Estudiante${i} Grupo6`
+          displayName: `Estudiante${i} Grupo6`,
+          assignedRoutineIds: routineIds6
         });
         totalGenerated++;
       }
