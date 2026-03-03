@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FitnessService } from '../../services/fitness.service';
-import { UserProfile } from '../../models/fitness.models';
+import { UserProfile, Routine } from '../../models/fitness.models';
+import { combineLatest, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ModalController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -12,6 +14,8 @@ import { ModalController, ToastController } from '@ionic/angular';
 })
 export class UserHomePage implements OnInit {
   userProfile: UserProfile | null = null;
+  assignedRoutines: Routine[] = [];
+  isLoadingRoutines: boolean = true;
 
   // Data for the modal
   isFirstTimeModalOpen: boolean = false;
@@ -38,6 +42,30 @@ export class UserHomePage implements OnInit {
           this.inputWeightUnit = profile.physicalData?.weightUnit || 'lb';
           this.inputHeight = profile.physicalData?.height || null;
         }
+
+        // Fetch assigned routines
+        if (profile.role === 'user') {
+          if (profile.assignedRoutineIds && profile.assignedRoutineIds.length > 0) {
+            this.isLoadingRoutines = true;
+            const routineObservables = profile.assignedRoutineIds.map(id =>
+              this.fitnessService.getRoutineById(id).pipe(
+                // Filter out undefined if routine was deleted but ID remains
+                map(routine => routine || null),
+                catchError(() => of(null))
+              )
+            );
+
+            combineLatest(routineObservables).subscribe(routines => {
+              this.assignedRoutines = routines.filter(r => r !== null) as Routine[];
+              this.isLoadingRoutines = false;
+            });
+          } else {
+            this.assignedRoutines = [];
+            this.isLoadingRoutines = false;
+          }
+        }
+      } else {
+        this.isLoadingRoutines = false;
       }
     });
   }
