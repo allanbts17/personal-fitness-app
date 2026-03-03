@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -13,7 +14,11 @@ export class LoginPage {
     password = '';
     showPassword = false;
 
-    constructor(private auth: AuthService, private router: Router) { }
+    constructor(
+        private auth: AuthService,
+        private router: Router,
+        private toastController: ToastController
+    ) { }
 
     async login() {
         try {
@@ -25,9 +30,26 @@ export class LoginPage {
                     else this.router.navigate(['/user/home']);
                 }
             });
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert('Login failed: ' + (err as any).message);
+            let message = '';
+            switch (err.code) {
+                case 'auth/invalid-email':
+                    message = 'El correo electrónico no es válido.';
+                    break;
+                case 'auth/invalid-credential':
+                    message = 'La contraseña es incorrecta.';
+                    break;
+                default:
+                    message = 'Error al iniciar sesión. Intenta nuevamente.';
+            }
+            const toast = await this.toastController.create({
+                message: 'Error al iniciar sesión: ' + message,
+                duration: 3000,
+                color: 'danger',
+                position: 'bottom'
+            });
+            await toast.present();
         }
     }
 }
