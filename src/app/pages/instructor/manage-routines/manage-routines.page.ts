@@ -124,8 +124,16 @@ export class ManageRoutinesPage implements OnInit {
       const routineName = row['Rutina'];
       if (!routineName) return;
 
+      const normalizedRoutineName = this.normalizeString(routineName);
+      const existsInDb = this.existingRoutines.some(r => this.normalizeString(r.name) === normalizedRoutineName);
+
+      if (existsInDb) {
+        return; // Ignorar esta fila si la rutina ya existe en la base de datos
+      }
+
       if (!routinesMap.has(routineName)) {
         routinesMap.set(routineName, {
+          id: this.generateId(routineName),
           name: routineName,
           createdBy: this.instructorId,
           exercises: []
@@ -189,7 +197,7 @@ export class ManageRoutinesPage implements OnInit {
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "");
+      .replace(/[^a-z0-9]/g, "");
   }
 
   generateId(name: string): string {
@@ -207,12 +215,12 @@ export class ManageRoutinesPage implements OnInit {
     try {
       // Guardar ejercicios nuevos
       for (const ex of this.parsedNewExercises) {
-        await this.fitnessService.addExercise(ex);
+        await this.fitnessService.addExerciseWithId(ex);
       }
 
       // Guardar las rutinas
       for (const routine of this.parsedRoutines) {
-        await this.fitnessService.addRoutine(routine);
+        await this.fitnessService.addRoutineWithId(routine);
       }
 
       loading.dismiss();

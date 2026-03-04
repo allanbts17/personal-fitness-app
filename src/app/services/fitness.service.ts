@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../models/fitness.models';
 
@@ -20,6 +20,11 @@ export class FitnessService {
         return addDoc(colRef, exercise);
     }
 
+    addExerciseWithId(exercise: Exercise) {
+        const docRef = doc(this.firestore, `exercises/${exercise.id}`);
+        return setDoc(docRef, exercise);
+    }
+
     updateExercise(exerciseId: string, data: Partial<Exercise>) {
         const docRef = doc(this.firestore, `exercises/${exerciseId}`);
         return updateDoc(docRef, data);
@@ -35,6 +40,11 @@ export class FitnessService {
     addRoutine(routine: Routine) {
         const colRef = collection(this.firestore, 'routines');
         return addDoc(colRef, routine);
+    }
+
+    addRoutineWithId(routine: Routine) {
+        const docRef = doc(this.firestore, `routines/${routine.id}`);
+        return setDoc(docRef, routine);
     }
 
     getRoutineById(routineId: string): Observable<Routine | undefined> {
