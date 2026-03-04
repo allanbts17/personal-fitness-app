@@ -68,4 +68,11 @@ export interface WorkoutLog {
     totalExercisesCount?: number;
     // Feedback de la rutina
     difficulty?: 'easy' | 'normal' | 'hard';
+    pauseCount?: number;
+    exerciseLogs?: {
+        exerciseId: string;
+        reps: number;
+        isSkipped?: boolean;
+    }[];
+    skippedExercisesCount?: number;
 }

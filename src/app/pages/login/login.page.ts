@@ -13,6 +13,7 @@ export class LoginPage {
     email = '';
     password = '';
     showPassword = false;
+    rememberMe = false;
 
     constructor(
         private auth: AuthService,
@@ -22,7 +23,7 @@ export class LoginPage {
 
     async login() {
         try {
-            await this.auth.login(this.email, this.password);
+            await this.auth.login(this.email, this.password, this.rememberMe);
             this.auth.currentUser$.subscribe(profile => {
                 if (profile) {
                     if (profile.role === 'admin') this.router.navigate(['/admin/dashboard']);

@@ -1,0 +1,201 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" class="bg-[#2a52be]">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/user"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="font-bold text-white">{{ routine?.name || 'Rutina' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50 flex items-center justify-center">
+
+  <!-- INTRO STATE -->
+  <div *ngIf="state === 'intro'" class="flex flex-col h-full p-6 text-center mt-12">
+    <div *ngIf="routine">
+      <div class="bg-indigo-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-sm">
+        <ion-icon name="fitness" class="text-5xl text-[#2a52be]"></ion-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold text-gray-800 mb-4">{{ routine.name }}</h1>
+      <p class="text-gray-500 text-lg mb-12">{{ routine.description || 'Prepárate para dar lo mejor de ti.' }}</p>
+      
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 max-w-sm mx-auto w-full text-left">
+        <h4 class="font-bold text-gray-700 mb-3 flex items-center"><ion-icon name="list-outline" class="mr-2 text-[#2a52be]"></ion-icon> Resumen</h4>
+        <p class="text-gray-600 text-sm mb-1"><span class="font-semibold">{{ routine.exercises?.length || 0 }}</span> Ejercicios</p>
+      </div>
+
+      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg max-w-xs mx-auto w-full mt-auto shadow-lg shadow-indigo-200" (click)="startRoutine()">
+        Iniciar Rutina
+      </ion-button>
+    </div>
+    
+    <div *ngIf="!routine" class="flex flex-col items-center mt-20">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="mt-4 text-gray-500 font-medium">Cargando rutina...</p>
+    </div>
+  </div>
+
+  <!-- WAIT / PREP STATE -->
+  <div *ngIf="state === 'wait'" class="flex flex-col h-full p-6 text-center mt-4">
+    <h2 class="text-3xl font-extrabold mb-1" [ngClass]="isFirstExercise ? 'text-indigo-600' : 'text-orange-500'">
+      {{ isFirstExercise ? '¡Prepárate!' : 'Descanso' }}
+    </h2>
+    <p class="text-gray-500 font-medium mb-8">
+      {{ isFirstExercise ? 'El entrenamiento está por comenzar.' : 'Recupera el aliento.' }}
+    </p>
+
+    <!-- Visual Timer -->
+    <div class="relative w-48 h-48 mx-auto mb-8 flex items-center justify-center bg-white rounded-full shadow-inner border-[12px]" [ngClass]="isFirstExercise ? 'border-indigo-100' : 'border-orange-100'">
+      <span class="text-6xl font-black text-gray-800" [ngClass]="{'animate-pulse text-red-500': timeLeft <= 5}">
+        {{ timeLeft }}
+      </span>
+      <!-- Pause overlay -->
+      <div *ngIf="isPaused" class="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center flex-col">
+        <ion-icon name="pause" class="text-4xl text-[#2a52be]"></ion-icon>
+        <span class="font-bold text-[#2a52be]">Pausado</span>
+      </div>
+    </div>
+    <ion-progress-bar [value]="progress" color="primary" class="rounded-full h-3 mb-8 w-3/4 mx-auto"></ion-progress-bar>
+
+    <!-- Prev Reps Input (only during Rest) -->
+    <div *ngIf="!isFirstExercise" class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-6 max-w-xs mx-auto w-full text-left">
+      <label class="block text-sm font-bold text-gray-700 mb-2 text-center">Registrar repeticiones anteriores</label>
+      <ion-input type="number" [(ngModel)]="currentRepsInput" placeholder="Ej. 12" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold text-xl text-center"></ion-input>
+    </div>
+
+    <!-- Next Exercise Card -->
+    <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 max-w-sm mx-auto w-full">
+      <div class="flex items-center justify-between mb-2">
+         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Siguiente</p>
+         <button (click)="showInfo()" *ngIf="currentSetData.actualExercise?.description" class="text-[#2a52be] bg-indigo-50 w-8 h-8 rounded-full flex items-center justify-center">
+            <ion-icon name="help"></ion-icon>
+         </button>
+      </div>
+      <div class="flex items-center space-x-4 text-left">
+        <div class="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
+          <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/icon/generic-fitness.png'" class="object-cover w-full h-full opacity-50" onerror="this.src='assets/icon/generic-fitness.png';" />
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ currentSetData.actualExercise?.name || currentSetData.routineExercise.exerciseName }}</h3>
+          <p class="text-sm text-[#2a52be] font-bold mt-1">
+            Serie {{ currentSetData.setNumber }} 
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 flex justify-center items-center w-full max-w-sm mx-auto space-x-2">
+      <ion-button fill="clear" color="medium" class="font-bold flex-1" (click)="togglePause()">
+        <ion-icon [name]="isPaused ? 'play' : 'pause'" slot="start"></ion-icon> Pausa
+      </ion-button>
+      <ion-button fill="clear" color="primary" class="font-bold flex-1" (click)="skipWait()">
+        Omitir Espera <ion-icon name="play-forward" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- EXERCISE STATE -->
+  <div *ngIf="state === 'exercise'" class="flex flex-col h-full p-6 text-center">
+    
+    <div class="flex justify-between items-center mb-6">
+       <div class="text-left">
+          <p class="text-[#2a52be] font-bold text-sm tracking-widest uppercase mb-1">Serie {{ currentSetData.setNumber }}</p>
+          <h2 class="text-3xl font-extrabold text-gray-800 leading-tight">
+            {{ currentSetData.actualExercise?.name || currentSetData.routineExercise.exerciseName }}
+          </h2>
+       </div>
+       <button (click)="showInfo()" *ngIf="currentSetData.actualExercise?.description" class="text-[#2a52be] bg-indigo-50 w-12 h-12 rounded-full flex items-center justify-center shadow-sm shrink-0">
+          <ion-icon name="help" class="text-xl"></ion-icon>
+       </button>
+    </div>
+
+    <div class="w-full aspect-video bg-gray-200 rounded-3xl overflow-hidden mb-8 shadow-inner flex items-center justify-center">
+        <!-- Generic Image or Exercise Image -->
+        <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/icon/generic-fitness.png'" class="object-cover w-full h-full" onerror="this.src='assets/icon/generic-fitness.png';" />
+    </div>
+
+    <!-- Timer Setup -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mt-auto max-w-sm mx-auto w-full text-center relative">
+       <!-- Pause overlay -->
+       <div *ngIf="isPaused" class="absolute inset-0 bg-white/90 z-10 rounded-3xl flex items-center justify-center flex-col shadow-lg backdrop-blur-sm">
+         <ion-icon name="pause" class="text-5xl text-[#2a52be] mb-2"></ion-icon>
+         <h3 class="font-bold text-2xl text-[#2a52be]">PAUSADO</h3>
+         <ion-button fill="clear" (click)="togglePause()" class="mt-4 font-bold">Reanudar</ion-button>
+       </div>
+
+       <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Tiempo</p>
+       <div class="text-6xl font-black text-[#2a52be] tabular-nums mb-4">
+         {{ formatTime(timeLeft) }}
+       </div>
+       <ion-progress-bar *ngIf="totalTime > 0" [value]="progress" color="primary" class="rounded-full h-4 mb-2"></ion-progress-bar>
+       <p *ngIf="totalTime === 0" class="text-sm font-medium text-gray-500 mb-4 animate-pulse">Contando hacia arriba...</p>
+       
+       <ion-button *ngIf="totalTime === 0" expand="block" shape="round" color="primary" class="h-14 font-bold mt-4 text-lg" (click)="finishCurrentExercise()">
+         Siguiente
+       </ion-button>
+       
+       <div class="mt-2 flex justify-center items-center w-full space-x-2">
+         <ion-button fill="clear" color="medium" class="font-bold flex-1" (click)="togglePause()">
+           <ion-icon [name]="isPaused ? 'play' : 'pause'" slot="start"></ion-icon> Pausa
+         </ion-button>
+         <ion-button fill="clear" color="danger" class="font-bold flex-1" (click)="skipCurrentExercise()">
+           <ion-icon name="play-skip-forward" slot="start"></ion-icon> Saltar 
+         </ion-button>
+       </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY STATE -->
+  <div *ngIf="state === 'summary'" class="flex flex-col h-full p-6 pb-12 mt-4">
+    <div class="text-center mb-8">
+      <div class="bg-green-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 backdrop-blur shadow-sm">
+        <ion-icon name="checkmark-done" class="text-6xl text-green-600"></ion-icon>
+      </div>
+      <h2 class="text-3xl font-extrabold text-gray-800">¡Rutina Completada!</h2>
+      <p class="text-gray-500 font-medium text-lg">Gran trabajo de hoy.</p>
+    </div>
+
+    <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center mb-8 mx-auto max-w-sm w-full">
+       <span class="font-bold text-gray-600 flex items-center"><ion-icon name="pause" class="mr-2"></ion-icon> Pausas realizadas:</span>
+       <span class="text-2xl font-black text-[#2a52be]">{{ pauseCount }}</span>
+    </div>
+
+    <!-- Missing Reps List -->
+    <div *ngIf="missingRepsLogs.length > 0" class="mb-8">
+      <h3 class="font-bold text-gray-800 text-lg mb-4 text-center">Completa los datos faltantes:</h3>
+      <div class="space-y-3 max-w-sm mx-auto w-full">
+        <div *ngFor="let log of missingRepsLogs" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div class="text-left w-2/3">
+            <p class="font-bold text-sm text-gray-800 truncate">{{ log.name }}</p>
+            <p class="text-xs text-indigo-500 font-bold">Serie {{ log.setNumber }}</p>
+          </div>
+          <div class="w-1/3 ml-4">
+             <ion-input type="number" [(ngModel)]="log.reps" placeholder="Reps" class="bg-gray-50 border border-gray-200 rounded-lg px-2 text-center font-bold text-sm w-full"></ion-input>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Difficulty Feedback -->
+    <div class="max-w-sm mx-auto w-full mb-8 text-center">
+      <h3 class="font-bold text-gray-800 text-lg mb-4">¿Cómo sentiste la sesión?</h3>
+      <div class="flex justify-between space-x-2">
+        <button [ngClass]="difficulty === 'hard' ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-500 border-gray-200'" class="flex-1 py-3 rounded-2xl border font-bold text-sm transition-all shadow-sm" (click)="setDifficulty('hard')">
+          <ion-icon name="flame" class="text-lg mb-1 block mx-auto"></ion-icon> Muy difícil
+        </button>
+        <button [ngClass]="difficulty === 'normal' ? 'bg-[#2a52be] text-white border-[#2a52be]' : 'bg-white text-gray-500 border-gray-200'" class="flex-1 py-3 rounded-2xl border font-bold text-sm transition-all shadow-sm" (click)="setDifficulty('normal')">
+          <ion-icon name="happy" class="text-lg mb-1 block mx-auto"></ion-icon> Normal
+        </button>
+        <button [ngClass]="difficulty === 'easy' ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-500 border-gray-200'" class="flex-1 py-3 rounded-2xl border font-bold text-sm transition-all shadow-sm" (click)="setDifficulty('easy')">
+          <ion-icon name="leaf" class="text-lg mb-1 block mx-auto"></ion-icon> Muy fácil
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-auto pt-4 max-w-md mx-auto w-full">
+      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg shadow-lg" (click)="submitLog()">
+        Finalizar Rutina
+      </ion-button>
+    </div>
+  </div>
+
+</ion-content>

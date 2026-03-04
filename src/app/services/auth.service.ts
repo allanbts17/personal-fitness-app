@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, UserCredential, updatePassword, sendPasswordResetEmail } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, UserCredential, updatePassword, sendPasswordResetEmail, setPersistence, browserSessionPersistence, browserLocalPersistence } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, map, shareReplay } from 'rxjs/operators';
@@ -21,7 +21,9 @@ export class AuthService {
         );
     }
 
-    async login(email: string, pass: string) {
+    async login(email: string, pass: string, remember: boolean = false) {
+        const persistenceType = remember ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(this.auth, persistenceType);
         return signInWithEmailAndPassword(this.auth, email, pass);
     }
 
