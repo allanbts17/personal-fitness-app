@@ -77,7 +77,7 @@
         <div>
           <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ currentSetData.actualExercise?.name || currentSetData.routineExercise.exerciseName }}</h3>
           <p class="text-sm text-[#2a52be] font-bold mt-1">
-            Serie {{ currentSetData.setNumber }} 
+            Ejercicio {{ currentSetData.exerciseIndex + 1 }} de {{ allSets.length }}
           </p>
         </div>
       </div>
@@ -98,7 +98,7 @@
     
     <div class="flex justify-between items-center mb-6">
        <div class="text-left">
-          <p class="text-[#2a52be] font-bold text-sm tracking-widest uppercase mb-1">Serie {{ currentSetData.setNumber }}</p>
+          <p class="text-[#2a52be] font-bold text-sm tracking-widest uppercase mb-1">Ejercicio {{ currentSetData.exerciseIndex + 1 }} de {{ allSets.length }}</p>
           <h2 class="text-3xl font-extrabold text-gray-800 leading-tight">
             {{ currentSetData.actualExercise?.name || currentSetData.routineExercise.exerciseName }}
           </h2>
@@ -159,22 +159,6 @@
        <span class="text-2xl font-black text-[#2a52be]">{{ pauseCount }}</span>
     </div>
 
-    <!-- Missing Reps List -->
-    <div *ngIf="missingRepsLogs.length > 0" class="mb-8">
-      <h3 class="font-bold text-gray-800 text-lg mb-4 text-center">Completa los datos faltantes:</h3>
-      <div class="space-y-3 max-w-sm mx-auto w-full">
-        <div *ngFor="let log of missingRepsLogs" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div class="text-left w-2/3">
-            <p class="font-bold text-sm text-gray-800 truncate">{{ log.name }}</p>
-            <p class="text-xs text-indigo-500 font-bold">Serie {{ log.setNumber }}</p>
-          </div>
-          <div class="w-1/3 ml-4">
-             <ion-input type="number" [(ngModel)]="log.reps" placeholder="Reps" class="bg-gray-50 border border-gray-200 rounded-lg px-2 text-center font-bold text-sm w-full"></ion-input>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Difficulty Feedback -->
     <div class="max-w-sm mx-auto w-full mb-8 text-center">
       <h3 class="font-bold text-gray-800 text-lg mb-4">¿Cómo sentiste la sesión?</h3>
@@ -188,6 +172,30 @@
         <button [ngClass]="difficulty === 'easy' ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-500 border-gray-200'" class="flex-1 py-3 rounded-2xl border font-bold text-sm transition-all shadow-sm" (click)="setDifficulty('easy')">
           <ion-icon name="leaf" class="text-lg mb-1 block mx-auto"></ion-icon> Muy fácil
         </button>
+      </div>
+    </div>
+
+    <!-- Reps List -->
+    <div *ngIf="summaryLogs.length > 0" class="mb-8">
+      <h3 class="font-bold text-gray-800 text-lg mb-4 text-center">Resumen de repeticiones:</h3>
+      <div class="space-y-3 max-w-sm mx-auto w-full">
+        <div *ngFor="let log of summaryLogs" class="bg-white p-4 rounded-2xl shadow-sm border flex items-center justify-between transition-colors" [ngClass]="log.isSkipped ? 'border-gray-300 bg-gray-50 opacity-80' : ((log.reps !== null && log.reps > 0) ? 'border-green-400 bg-green-50' : 'border-orange-200')">
+          <div class="text-left w-2/3 flex items-center overflow-hidden">
+            <ion-icon *ngIf="log.isSkipped" name="play-skip-forward" class="text-gray-500 mr-2 text-xl shrink-0"></ion-icon>
+            <ion-icon *ngIf="!log.isSkipped && log.reps !== null && log.reps > 0" name="checkmark-circle" class="text-green-500 mr-2 text-xl shrink-0"></ion-icon>
+            <ion-icon *ngIf="!log.isSkipped && (log.reps === null || log.reps === undefined || log.reps === 0)" name="alert-circle" class="text-orange-500 mr-2 text-xl shrink-0"></ion-icon>
+            <div class="overflow-hidden">
+              <p class="font-bold text-sm text-gray-800 truncate">{{ log.name }}</p>
+              <div class="flex items-center mt-1">
+                <p class="text-xs text-indigo-500 font-bold mr-2">Ejercicio {{ log.exerciseIndex + 1 }}</p>
+                <span *ngIf="log.isSkipped" class="text-[10px] font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Saltado</span>
+              </div>
+            </div>
+          </div>
+          <div class="w-1/3 ml-4 shrink-0">
+             <ion-input type="number" [(ngModel)]="log.reps" placeholder="Reps" class="bg-white border rounded-lg px-2 text-center font-bold text-sm w-full transition-colors" [ngClass]="log.isSkipped ? 'border-gray-300 text-gray-600' : ((log.reps !== null && log.reps > 0) ? 'border-green-300 text-green-700' : 'border-gray-200')"></ion-input>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -37,9 +37,7 @@ export interface Routine {
     exercises: {
         exerciseId: string;
         exerciseName?: string; // Cache the name from our previous strategy
-        sets?: number;
         reps?: string | number;
-        weight?: number;
         durationValue?: number;
         restSeconds?: number;
         order?: number;
@@ -73,6 +71,7 @@ export interface WorkoutLog {
         exerciseId: string;
         reps: number;
         isSkipped?: boolean;
+        durationSeconds?: number;
     }[];
     skippedExercisesCount?: number;
 }

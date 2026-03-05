@@ -10,7 +10,6 @@ type ExecutionState = 'intro' | 'wait' | 'exercise' | 'summary';
 
 interface SetData {
   exerciseIndex: number;
-  setNumber: number;
   routineExercise: any; // from routine.exercises
   actualExercise: Exercise | undefined;
 }
@@ -46,8 +45,7 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
   currentRepsInput: number | null = null;
 
   // Log data
-  // Log data
-  exerciseLogs: { logIndex: number, exerciseIndex: number, setNumber: number, reps: number | null, exerciseId: string, name: string, isSkipped?: boolean }[] = [];
+  exerciseLogs: { logIndex: number, exerciseIndex: number, reps: number | null, exerciseId: string, name: string, isSkipped?: boolean, durationSeconds?: number }[] = [];
   difficulty: 'easy' | 'normal' | 'hard' | null = null;
   // ... (keep the rest the same up to missingRepsLogs)
   // I need to use multi_replace for multiple changes, or do them one by one. I will use multi_replace instead of this.
@@ -107,24 +105,19 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
 
     let logIdx = 0;
     sortedEx.forEach((rx, index) => {
-      const sets = rx.sets || 1;
       const actualEx = this.allExercises.find(e => e.id === rx.exerciseId);
-      for (let i = 1; i <= sets; i++) {
-        this.allSets.push({
-          exerciseIndex: index,
-          setNumber: i,
-          routineExercise: rx,
-          actualExercise: actualEx
-        });
-        this.exerciseLogs.push({
-          logIndex: logIdx++,
-          exerciseIndex: index,
-          setNumber: i,
-          reps: null,
-          exerciseId: rx.exerciseId,
-          name: rx.exerciseName || actualEx?.name || 'Ejercicio'
-        });
-      }
+      this.allSets.push({
+        exerciseIndex: index,
+        routineExercise: rx,
+        actualExercise: actualEx
+      });
+      this.exerciseLogs.push({
+        logIndex: logIdx++,
+        exerciseIndex: index,
+        reps: null,
+        exerciseId: rx.exerciseId,
+        name: rx.exerciseName || actualEx?.name || 'Ejercicio'
+      });
     });
   }
 
@@ -181,6 +174,17 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
   }
 
   finishCurrentExercise() {
+    // Save duration before clearing the timer
+    let elapsed = 0;
+    if (this.totalTime > 0) {
+      elapsed = this.totalTime - this.timeLeft;
+    } else {
+      elapsed = this.timeLeft;
+    }
+    if (this.currentSetIndex < this.exerciseLogs.length) {
+      this.exerciseLogs[this.currentSetIndex].durationSeconds = elapsed;
+    }
+
     this.clearTimer();
     this.currentSetIndex++;
     if (this.currentSetIndex < this.allSets.length) {
@@ -285,13 +289,12 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
   skipCurrentExercise() {
     if (this.currentSetIndex < this.exerciseLogs.length) {
       this.exerciseLogs[this.currentSetIndex].isSkipped = true;
-      this.exerciseLogs[this.currentSetIndex].reps = 0;
     }
     this.finishCurrentExercise();
   }
 
-  get missingRepsLogs() {
-    return this.exerciseLogs.filter(l => !l.isSkipped && (l.reps === null || l.reps === undefined));
+  get summaryLogs() {
+    return this.exerciseLogs;
   }
 
   setDifficulty(diff: 'easy' | 'normal' | 'hard') {
@@ -310,7 +313,8 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
     const sumReps = this.exerciseLogs.map(l => ({
       exerciseId: l.exerciseId,
       reps: l.reps || 0,
-      isSkipped: !!l.isSkipped
+      isSkipped: !!l.isSkipped,
+      durationSeconds: l.durationSeconds || 0
     }));
 
     const skippedCount = this.exerciseLogs.filter(l => l.isSkipped).length;
@@ -331,7 +335,7 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
     try {
       await this.fitnessService.logWorkout(log);
       this.showToast('¡Rutina finalizada con éxito!', 'success');
-      this.navCtrl.navigateRoot('/user'); // Go back to dashboard
+      this.navCtrl.navigateRoot('/user/home'); // Go back to user dashboard
     } catch (err) {
       this.showToast('Error al guardar la rutina', 'danger');
     }
