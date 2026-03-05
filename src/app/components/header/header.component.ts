@@ -3,8 +3,8 @@ import { NavController } from '@ionic/angular';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-    selector: 'app-header',
-    template: `
+  selector: 'app-header',
+  template: `
     <ion-header class="ion-no-border">
       <ion-toolbar color="primary">
         <ion-buttons slot="start" *ngIf="showBackButton">
@@ -19,20 +19,22 @@ import { AuthService } from '../../services/auth.service';
       </ion-toolbar>
     </ion-header>
   `,
-    standalone: false
+  standalone: false
 })
 export class HeaderComponent {
-    @Input() title: string = '';
-    @Input() showBackButton: boolean = false;
-    @Input() defaultHref: string = '';
+  @Input() title: string = '';
+  @Input() showBackButton: boolean = false;
+  @Input() defaultHref: string = '';
 
-    constructor(
-        private authService: AuthService,
-        private navCtrl: NavController
-    ) { }
+  constructor(
+    private authService: AuthService,
+    private navCtrl: NavController
+  ) { }
 
-    async logout() {
-        await this.authService.logout();
-        this.navCtrl.navigateRoot('/login');
-    }
+  async logout() {
+    await this.authService.logout();
+    setTimeout(() => {
+      this.navCtrl.navigateRoot('/login');
+    });
+  }
 }
