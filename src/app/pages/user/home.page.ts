@@ -16,6 +16,8 @@ export class UserHomePage implements OnInit {
   userProfile: UserProfile | null = null;
   assignedRoutines: Routine[] = [];
   isLoadingRoutines: boolean = true;
+  routineProgress: { [key: string]: number } = {};
+  totalWorkouts: number = 0;
 
   // Data for the modal
   isFirstTimeModalOpen: boolean = false;
@@ -45,6 +47,32 @@ export class UserHomePage implements OnInit {
 
         // Fetch assigned routines
         if (profile.role === 'user') {
+          // Fetch user logs to calculate routine progress and total workouts
+          this.fitnessService.getUserLogs(profile.uid).subscribe(logs => {
+            if (logs) {
+              this.totalWorkouts = logs.length;
+
+              this.routineProgress = {};
+              const processedRoutines = new Set<string>();
+              for (const log of logs) {
+                if (log.routineId && !processedRoutines.has(log.routineId)) {
+                  processedRoutines.add(log.routineId);
+                  const complete = log.completedExercisesCount || 0;
+                  const total = log.totalExercisesCount || 0;
+                  if (total > 0) {
+                    const percentage = Math.round((complete / total) * 100);
+                    this.routineProgress[log.routineId] = Math.min(percentage, 100);
+                  } else {
+                    this.routineProgress[log.routineId] = 0;
+                  }
+                }
+              }
+            } else {
+              this.totalWorkouts = 0;
+              this.routineProgress = {};
+            }
+          });
+
           if (profile.assignedRoutineIds && profile.assignedRoutineIds.length > 0) {
             this.isLoadingRoutines = true;
             const routineObservables = profile.assignedRoutineIds.map(id =>

@@ -310,15 +310,45 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
     if (!this.userProfile) return;
 
     // Formato de ejercicios para guardar
-    const sumReps = this.exerciseLogs.map(l => ({
-      exerciseId: l.exerciseId,
-      reps: l.reps || 0,
-      isSkipped: !!l.isSkipped,
-      durationSeconds: l.durationSeconds || 0
-    }));
+    let completedCount = 0;
+    let skippedCount = 0;
 
-    const skippedCount = this.exerciseLogs.filter(l => l.isSkipped).length;
-    const completedCount = this.allSets.length - skippedCount;
+    const sumReps = this.exerciseLogs.map((l, index) => {
+      const rx = this.allSets[index].routineExercise;
+
+      let maxReps = Infinity;
+      if (rx.reps) {
+        if (typeof rx.reps === 'number') {
+          maxReps = rx.reps;
+        } else {
+          const matches = String(rx.reps).match(/(\d+)/g);
+          if (matches && matches.length > 0) {
+            maxReps = Math.max(...matches.map(Number));
+          }
+        }
+      }
+
+      const actualReps = l.reps || 0;
+      const finalReps = Math.min(actualReps, maxReps);
+
+      // The user wants any skipped exercise to be considered completed for progress purposes
+      const isCompleted = true;
+
+      if (l.isSkipped) {
+        skippedCount++;
+      }
+
+      if (isCompleted) {
+        completedCount++;
+      }
+
+      return {
+        exerciseId: l.exerciseId,
+        reps: finalReps,
+        isSkipped: !!l.isSkipped,
+        durationSeconds: l.durationSeconds || 0
+      };
+    });
 
     const log: WorkoutLog = {
       userId: this.userProfile.uid,
