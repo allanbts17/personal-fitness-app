@@ -16,8 +16,18 @@ export class UserHomePage implements OnInit {
   userProfile: UserProfile | null = null;
   assignedRoutines: Routine[] = [];
   isLoadingRoutines: boolean = true;
-  routineProgress: { [key: string]: number } = {};
+  globalProgress: number = 0;
+  completedRoutinesIds: Set<string> = new Set<string>();
   totalWorkouts: number = 0;
+  routineFilter: 'all' | 'completed' | 'pending' = 'all';
+
+  get filteredRoutines(): Routine[] {
+    if (this.routineFilter === 'all') return this.assignedRoutines;
+    if (this.routineFilter === 'completed') {
+      return this.assignedRoutines.filter(r => this.completedRoutinesIds.has(r.id!));
+    }
+    return this.assignedRoutines.filter(r => !this.completedRoutinesIds.has(r.id!));
+  }
 
   // Data for the modal
   isFirstTimeModalOpen: boolean = false;
@@ -52,24 +62,18 @@ export class UserHomePage implements OnInit {
             if (logs) {
               this.totalWorkouts = logs.length;
 
-              this.routineProgress = {};
+              this.globalProgress = 0;
               const processedRoutines = new Set<string>();
               for (const log of logs) {
                 if (log.routineId && !processedRoutines.has(log.routineId)) {
                   processedRoutines.add(log.routineId);
-                  const complete = log.completedExercisesCount || 0;
-                  const total = log.totalExercisesCount || 0;
-                  if (total > 0) {
-                    const percentage = Math.round((complete / total) * 100);
-                    this.routineProgress[log.routineId] = Math.min(percentage, 100);
-                  } else {
-                    this.routineProgress[log.routineId] = 0;
-                  }
+                  this.completedRoutinesIds.add(log.routineId);
                 }
               }
             } else {
               this.totalWorkouts = 0;
-              this.routineProgress = {};
+              this.globalProgress = 0;
+              this.completedRoutinesIds.clear();
             }
           });
 
@@ -86,16 +90,47 @@ export class UserHomePage implements OnInit {
             combineLatest(routineObservables).subscribe(routines => {
               this.assignedRoutines = routines.filter(r => r !== null) as Routine[];
               this.isLoadingRoutines = false;
-            });
-          } else {
-            this.assignedRoutines = [];
+
+              this.fitnessService.getUserLogs(profile.uid).subscribe(logs => {
+                this.calculateGlobalProgress(logs || []);
+              });
+            }); // Closing combineLatest subscription
+          } else { // Else for if (profile.assignedRoutineIds...)
             this.isLoadingRoutines = false;
           }
-        }
-      } else {
-        this.isLoadingRoutines = false;
-      }
+        } // Closing if (profile.role === 'user')
+      } // Closing if (profile)
+    }); // Closing authService.currentUser$ subscription
+  }
+
+  calculateGlobalProgress(logs: any[]) {
+    // Total exercises mapped across all assigned routines
+    let totalAssignedExercisesCount = 0;
+    this.assignedRoutines.forEach(routine => {
+      totalAssignedExercisesCount += routine.exercises?.length || 0;
     });
+
+    if (totalAssignedExercisesCount === 0) {
+      this.globalProgress = 0;
+      return;
+    }
+
+    let totalCompletedExercisesCount = 0;
+    const processedRoutines = new Set<string>();
+
+    // Sort or get from latest the complete count from logs
+    for (const log of logs) {
+      if (log.routineId && !processedRoutines.has(log.routineId)) {
+        processedRoutines.add(log.routineId);
+        // Only strictly count routines that belong to the user's currently assigned list
+        if (this.assignedRoutines.some(r => r.id === log.routineId)) {
+          totalCompletedExercisesCount += log.completedExercisesCount || 0;
+        }
+      }
+    }
+
+    const percentage = Math.round((totalCompletedExercisesCount / totalAssignedExercisesCount) * 100);
+    this.globalProgress = Math.min(percentage, 100);
   }
 
   openEditModal() {

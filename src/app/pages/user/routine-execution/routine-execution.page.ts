@@ -43,6 +43,20 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
 
   // Current Reps entered by user
   currentRepsInput: number | null = null;
+  get maxRepsForCurrentExercise(): number {
+    if (!this.routine || !this.allSets || this.allSets.length === 0) return Infinity;
+    const rx = this.allSets[this.currentSetIndex > 0 ? this.currentSetIndex - 1 : 0]?.routineExercise;
+    if (!rx || !rx.reps) return Infinity;
+
+    if (typeof rx.reps === 'number') return rx.reps;
+
+    const matches = String(rx.reps).match(/(\d+)/g);
+    if (matches && matches.length > 0) {
+      return Math.max(...matches.map(Number));
+    }
+    return Infinity;
+  }
+
 
   // Log data
   exerciseLogs: { logIndex: number, exerciseIndex: number, reps: number | null, exerciseId: string, name: string, isSkipped?: boolean, durationSeconds?: number }[] = [];
@@ -312,6 +326,7 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
     // Formato de ejercicios para guardar
     let completedCount = 0;
     let skippedCount = 0;
+    let hasValidationErrors = false;
 
     const sumReps = this.exerciseLogs.map((l, index) => {
       const rx = this.allSets[index].routineExercise;
@@ -329,7 +344,10 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
       }
 
       const actualReps = l.reps || 0;
-      const finalReps = Math.min(actualReps, maxReps);
+
+      if (actualReps > maxReps) {
+        hasValidationErrors = true;
+      }
 
       // The user wants any skipped exercise to be considered completed for progress purposes
       const isCompleted = true;
@@ -344,11 +362,16 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
 
       return {
         exerciseId: l.exerciseId,
-        reps: finalReps,
+        reps: actualReps,
         isSkipped: !!l.isSkipped,
         durationSeconds: l.durationSeconds || 0
       };
     });
+
+    if (hasValidationErrors) {
+      this.showToast('Por favor corrige las repeticiones irreales antes de continuar.', 'danger');
+      return;
+    }
 
     const log: WorkoutLog = {
       userId: this.userProfile.uid,
@@ -386,4 +409,16 @@ export class RoutineExecutionPage implements OnInit, OnDestroy {
     const s = secs % 60;
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   }
+
+  getMaxReps(index: number): number {
+    const rx = this.allSets[index]?.routineExercise;
+    if (!rx || !rx.reps) return Infinity;
+    if (typeof rx.reps === 'number') return rx.reps;
+    const matches = String(rx.reps).match(/(\d+)/g);
+    if (matches && matches.length > 0) {
+      return Math.max(...matches.map(Number));
+    }
+    return Infinity;
+  }
 }
+
