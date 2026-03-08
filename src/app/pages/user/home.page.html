@@ -32,23 +32,17 @@
       </div>
 
       <!-- Filter Toggle -->
-      <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-6 w-full">
-        <button (click)="routineFilter = 'all'" 
-                class="flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300"
-                [ngClass]="routineFilter === 'all' ? 'bg-white text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
-          Todas
-        </button>
-        <button (click)="routineFilter = 'completed'" 
-                class="flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300"
-                [ngClass]="routineFilter === 'completed' ? 'bg-white text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
-          Completadas
-        </button>
-        <button (click)="routineFilter = 'pending'" 
-                class="flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300"
-                [ngClass]="routineFilter === 'pending' ? 'bg-white text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
-          Pendientes
-        </button>
-      </div>
+      <ion-segment [(ngModel)]="routineFilter" class="mb-6">
+        <ion-segment-button value="all">
+          <ion-label class="font-bold">Todas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completed">
+          <ion-label class="font-bold">Completadas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pending">
+          <ion-label class="font-bold">Pendientes</ion-label>
+        </ion-segment-button>
+      </ion-segment>
       
       <!-- Loading State -->
       <div *ngIf="isLoadingRoutines" class="flex flex-col space-y-3">
@@ -142,20 +136,14 @@
               <div class="flex justify-between items-center mb-2">
                  <label class="block text-sm font-semibold text-gray-700">Tu Peso</label>
                  <!-- Segment control for kg/lb -->
-                 <div class="bg-gray-100 p-1 rounded-xl inline-flex shadow-inner">
-                    <button 
-                       (click)="inputWeightUnit = 'lb'"
-                       class="px-4 py-1.5 text-sm font-bold rounded-lg transition-all duration-200"
-                       [ngClass]="inputWeightUnit === 'lb' ? 'bg-white shadow scale-105 text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
-                       LB
-                    </button>
-                    <button 
-                       (click)="inputWeightUnit = 'kg'"
-                       class="px-4 py-1.5 text-sm font-bold rounded-lg transition-all duration-200 ml-1"
-                       [ngClass]="inputWeightUnit === 'kg' ? 'bg-white shadow scale-105 text-[#2a52be]' : 'text-gray-500 hover:text-gray-700'">
-                       KG
-                    </button>
-                 </div>
+                 <ion-segment [(ngModel)]="inputWeightUnit" mode="ios" style="width: auto;">
+                    <ion-segment-button value="lb">
+                      <ion-label class="font-bold">LB</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="kg">
+                      <ion-label class="font-bold">KG</ion-label>
+                    </ion-segment-button>
+                 </ion-segment>
               </div>
               <ion-input
                 type="number"
