@@ -98,6 +98,20 @@
           </div>
         </div>
 
+        <!-- Footer Card -->
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <ion-button 
+            fill="solid" 
+            color="primary" 
+            shape="round" 
+            size="small" 
+            class="font-bold px-4"
+            [routerLink]="['/instructor/student-details', student.uid]">
+            Ver Detalles
+            <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+
       </div>
     </div>
   </div>

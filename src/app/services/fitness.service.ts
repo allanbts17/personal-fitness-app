@@ -93,6 +93,11 @@ export class FitnessService {
         return collectionData(q, { idField: 'uid' }) as Observable<UserProfile[]>;
     }
 
+    getUserById(uid: string): Observable<UserProfile | undefined> {
+        const docRef = doc(this.firestore, `users/${uid}`);
+        return docData(docRef, { idField: 'uid' }) as Observable<UserProfile | undefined>;
+    }
+
     updatePhysicalData(userId: string, data: { weight: number, weightUnit: 'kg' | 'lb', height: number, bmi: number }) {
         const docRef = doc(this.firestore, `users/${userId}`);
         return updateDoc(docRef, {
@@ -106,5 +111,15 @@ export class FitnessService {
     assignRoutineToUser(userId: string, routineId: string) {
         const docRef = doc(this.firestore, `users/${userId}`);
         return updateDoc(docRef, { assignedRoutineIds: arrayUnion(routineId) });
+    }
+
+    getGeneralConfig(): Observable<any> {
+        const docRef = doc(this.firestore, 'config/general');
+        return docData(docRef) as Observable<any>;
+    }
+
+    updateGeneralConfig(data: any) {
+        const docRef = doc(this.firestore, 'config/general');
+        return setDoc(docRef, data, { merge: true });
     }
 }

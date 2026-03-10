@@ -39,7 +39,11 @@ const routes: Routes = [
     {
         path: 'routine-execution/:id',
         loadChildren: () => import('./pages/user/routine-execution/routine-execution.module').then(m => m.RoutineExecutionPageModule)
-    }
+    },  {
+    path: 'student-details',
+    loadChildren: () => import('./pages/instructor/student-details/student-details.module').then( m => m.StudentDetailsPageModule)
+  }
+
 
 ];
 

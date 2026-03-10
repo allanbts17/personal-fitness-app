@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FitnessService } from 'src/app/services/fitness.service';
-import { UserProfile, WorkoutLog } from 'src/app/models/fitness.models';
+import { UserProfile, WorkoutLog, Routine } from 'src/app/models/fitness.models';
 import { firstValueFrom } from 'rxjs';
 
 interface StudentProgress extends UserProfile {
@@ -45,6 +45,13 @@ export class StudentsPage implements OnInit {
     try {
       const users = await firstValueFrom(this.fitnessService.getAllStudents());
 
+      // Fetch all routines once for reference
+      const allRoutines = await firstValueFrom(this.fitnessService.getRoutinesByInstructor(''));
+      const routineMap = new Map<string, Routine>();
+      allRoutines.forEach(r => {
+        if (r.id) routineMap.set(r.id, r);
+      });
+
       // Extract unique groups
       const groups = new Set<number>();
       users.forEach((user: any) => {
@@ -57,20 +64,42 @@ export class StudentsPage implements OnInit {
       const studentsWithProgress = await Promise.all(users.map(async (user) => {
         const logs = await firstValueFrom(this.fitnessService.getUserLogs(user.uid));
 
+        // Count all workout sessions (logs)
         const completedRoutines = logs.length;
-        let totalAssigned = 0;
-        let totalCompleted = 0;
 
-        logs.forEach(log => {
-          if (log.totalExercisesCount) {
-            totalAssigned += log.totalExercisesCount;
-            totalCompleted += (log.completedExercisesCount || 0);
+        // Assigned routines for this specific student
+        const assignedIds = user.assignedRoutineIds || [];
+
+        // 1. Calculate total exercises in ALL assigned routines (denominator)
+        let totalAssignedExercises = 0;
+        assignedIds.forEach(id => {
+          const routine = routineMap.get(id);
+          if (routine) {
+            totalAssignedExercises += routine.exercises?.length || 0;
           }
         });
 
+        // 2. Sum of the latest (or maximum) completedExercisesCount for each ASSIGNED routine (numerator)
+        let totalCompletedExercises = 0;
+        if (totalAssignedExercises > 0) {
+          const latestLogsByRoutine = new Map<string, number>();
+
+          // Logs are sorted by date desc in getUserLogs service
+          logs.forEach(log => {
+            if (log.routineId && assignedIds.includes(log.routineId) && !latestLogsByRoutine.has(log.routineId)) {
+              latestLogsByRoutine.set(log.routineId, log.completedExercisesCount || 0);
+            }
+          });
+
+          latestLogsByRoutine.forEach(count => {
+            totalCompletedExercises += count;
+          });
+        }
+
         let overallExercisePercentage = 0;
-        if (totalAssigned > 0) {
-          overallExercisePercentage = Math.round((totalCompleted / totalAssigned) * 100);
+        if (totalAssignedExercises > 0) {
+          overallExercisePercentage = Math.round((totalCompletedExercises / totalAssignedExercises) * 100);
+          overallExercisePercentage = Math.min(overallExercisePercentage, 100);
         }
 
         return {

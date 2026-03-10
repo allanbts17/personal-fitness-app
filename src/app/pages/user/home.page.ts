@@ -20,6 +20,7 @@ export class UserHomePage implements OnInit {
   completedRoutinesIds: Set<string> = new Set<string>();
   totalWorkouts: number = 0;
   routineFilter: 'all' | 'completed' | 'pending' = 'all';
+  welcomeMessage: string = '';
 
   get filteredRoutines(): Routine[] {
     if (this.routineFilter === 'all') return this.assignedRoutines;
@@ -42,6 +43,12 @@ export class UserHomePage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.fitnessService.getGeneralConfig().subscribe(config => {
+      if (config) {
+        this.welcomeMessage = config.welcomeMessage || '';
+      }
+    });
+
     this.authService.currentUser$.subscribe(profile => {
       if (profile) {
         this.userProfile = profile;

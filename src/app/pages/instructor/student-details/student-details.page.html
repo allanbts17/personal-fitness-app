@@ -1,0 +1,164 @@
+<app-header [title]="student?.displayName || 'Detalle del Estudiante'" [showBackButton]="true" defaultHref="/instructor/students"></app-header>
+
+<ion-content class="bg-gray-50 ion-padding">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="mt-4 text-gray-500 font-medium">Cargando información del estudiante...</p>
+    </div>
+
+    <div *ngIf="!isLoading && student">
+      <!-- Student Info Card -->
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-8 overflow-hidden relative">
+        <div class="absolute top-0 right-0 p-6 opacity-10">
+          <ion-icon name="person" class="text-9xl"></ion-icon>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
+          <div *ngIf="student" class="bg-blue-600 text-white w-24 h-24 rounded-3xl flex items-center justify-center font-bold text-4xl shadow-lg shadow-blue-200 uppercase">
+            {{ student.displayName ? student.displayName.charAt(0) : (student.name ? student.name.charAt(0) : 'E') }}
+          </div>
+          
+          <div *ngIf="student" class="text-center md:text-left flex-1">
+            <div class="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+              <h1 class="text-3xl font-black text-gray-800">{{ student.displayName || (student.name ? (student.name + ' ' + (student.lastname || '')) : 'Estudiante') }}</h1>
+              <span *ngIf="student.group" class="inline-block bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit mx-auto md:mx-0">
+                Curso {{ student.group }}
+              </span>
+            </div>
+            <p class="text-gray-500 flex items-center justify-center md:justify-start mb-4">
+              <ion-icon name="mail-outline" class="mr-2"></ion-icon> {{ student.email }}
+            </p>
+
+            <!-- Physical Stats Row -->
+            <div *ngIf="student.physicalData" class="flex flex-wrap justify-center md:justify-start gap-4">
+              <div class="bg-gray-50 rounded-2xl p-3 border border-gray-100 min-w-[80px]">
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Peso</p>
+                <p class="font-bold text-gray-800">{{ student.physicalData.weight }}<span class="text-[10px] ml-0.5">{{ student.physicalData.weightUnit }}</span></p>
+              </div>
+              <div class="bg-gray-50 rounded-2xl p-3 border border-gray-100 min-w-[80px]">
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Altura</p>
+                <p class="font-bold text-gray-800">{{ student.physicalData.height }}<span class="text-[10px] ml-0.5">cm</span></p>
+              </div>
+              <div class="bg-gray-50 rounded-2xl p-3 border border-gray-100 min-w-[80px]">
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">IMC</p>
+                <p class="font-bold text-blue-600">{{ student.physicalData.bmi }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-xl font-extrabold text-gray-800">Historial de Entrenamientos</h2>
+        <div class="bg-white rounded-2xl border border-gray-200 px-4 py-1 flex items-center shadow-sm w-full md:w-auto">
+          <ion-icon name="filter-outline" class="text-gray-400 mr-2"></ion-icon>
+          <ion-select [(ngModel)]="selectedRoutineId" (ionChange)="applyFilter()" interface="popover" placeholder="Filtrar por rutina" class="w-full">
+            <ion-select-option value="all">Todas las rutinas</ion-select-option>
+            <ion-select-option *ngFor="let routine of routines" [value]="routine.id">{{ routine.name }}</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+
+      <!-- Logs Empty State -->
+      <div *ngIf="filteredLogs.length === 0" class="bg-white rounded-3xl p-12 text-center border border-dashed border-gray-200">
+        <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <ion-icon name="calendar-clear-outline" class="text-4xl text-gray-300"></ion-icon>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800">No hay registros</h3>
+        <p class="text-gray-500 px-4">El estudiante aún no ha completado entrenamientos de esta rutina.</p>
+      </div>
+
+      <!-- Logs Timeline/List -->
+      <div class="space-y-8 mb-10">
+        <div *ngFor="let log of filteredLogs" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          <!-- Log Header -->
+          <div class="p-5 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{{ log.routineName }}</p>
+              <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                <ion-icon name="time-outline" class="mr-2 text-gray-400"></ion-icon>
+                {{ log.formattedDate }}
+              </h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span [ngClass]="{
+                'bg-green-100 text-green-700': log.difficulty === 'easy',
+                'bg-blue-100 text-blue-700': log.difficulty === 'normal',
+                'bg-red-100 text-red-700': log.difficulty === 'hard'
+              }" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                {{ log.difficulty || 'Normal' }}
+              </span>
+              <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                {{ log.pauseCount || 0 }} Pausas
+              </span>
+            </div>
+          </div>
+
+          <!-- Log Content Body -->
+          <div class="p-5">
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-orange-50/50 rounded-2xl p-3 border border-orange-50">
+                <p class="text-[10px] text-orange-400 font-bold uppercase mb-1">Saltados</p>
+                <p class="text-xl font-black text-orange-700">{{ log.skippedExercisesCount || 0 }}</p>
+              </div>
+              <div *ngIf="log.duration || log.duration === 0" class="bg-green-50/50 rounded-2xl p-3 border border-green-50">
+                <p class="text-[10px] text-green-400 font-bold uppercase mb-1">Tiempo de Sesión</p>
+                <p class="text-xl font-black text-green-700">{{ log.duration }}<span class="text-xs font-normal ml-0.5">min</span></p>
+              </div>
+              <div class="bg-purple-50/50 rounded-2xl p-3 border border-purple-50">
+                <p class="text-[10px] text-purple-400 font-bold uppercase mb-1">Pausas</p>
+                <p class="text-xl font-black text-purple-700">{{ log.pauseCount || 0 }}</p>
+              </div>
+            </div>
+
+            <!-- Exercises List -->
+            <div class="space-y-3">
+              <div *ngFor="let ex of log.displayExercises" class="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-2xl border transition-all" [ngClass]="ex.isSkipped ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:border-blue-200'">
+                <div class="flex items-center gap-3 mb-3 md:mb-0">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" [ngClass]="ex.isSkipped ? 'bg-gray-200 text-gray-500' : 'bg-blue-100 text-blue-600'">
+                    <ion-icon [name]="ex.isSkipped ? 'play-skip-forward' : 'checkmark-done'"></ion-icon>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-gray-800 leading-tight">{{ ex.name }}</h4>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span *ngIf="ex.isSkipped" class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full uppercase tracking-tighter">Ejercicio Saltado</span>
+                      <span class="text-[11px] text-gray-600 font-bold bg-gray-100 px-2 py-0.5 rounded-md">Plan: {{ ex.plannedReps }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 md:flex md:items-center md:gap-8">
+                  <div class="text-center md:text-right">
+                    <p class="text-[11px] text-gray-400 font-bold uppercase mb-0.5 tracking-wider">Repeticiones</p>
+                    <p class="text-xl font-black text-gray-800">{{ ex.actualReps || 0 }}</p>
+                  </div>
+                  <div class="text-center md:text-right">
+                    <p class="text-[11px] text-gray-400 font-bold uppercase mb-0.5 tracking-wider">Duración</p>
+                    <div class="flex flex-col items-center md:items-end">
+                      <p class="text-xl font-black text-gray-800 leading-none mb-0.5">{{ formatDuration(ex.actualDuration) }}</p>
+                      <p class="text-[12px] text-gray-400 font-bold italic">de {{ formatDuration(ex.plannedDuration) }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes Section if exists -->
+            <div *ngIf="log.notes" class="mt-6 p-4 bg-yellow-50 rounded-2xl border border-yellow-100 flex gap-3">
+              <ion-icon name="document-text-outline" class="text-yellow-600 text-xl"></ion-icon>
+              <div>
+                <p class="text-[10px] text-yellow-600 font-black uppercase mb-1">Notas del estudiante</p>
+                <p class="text-sm text-yellow-800 italic">"{{ log.notes }}"</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

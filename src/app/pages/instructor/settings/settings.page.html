@@ -1,0 +1,51 @@
+<app-header title="Configuración General"></app-header>
+
+<ion-content class="ion-padding bg-gray-50">
+  <div class="max-w-2xl mx-auto mt-8">
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+          <ion-icon name="settings-outline" class="text-2xl"></ion-icon>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800">Mensaje de Bienvenida</h2>
+      </div>
+
+      <p class="text-sm text-gray-500 mb-4 text-balance">
+        Este mensaje se mostrará en la pantalla principal de todos tus estudiantes al iniciar sesión. Personalízalo para motivarlos o dar anuncios importantes.
+      </p>
+
+      <ion-item lines="none" class="bg-gray-50 rounded-lg p-1 mb-6 border border-gray-200">
+        <ion-textarea
+          [(ngModel)]="welcomeMessage"
+          placeholder="Escribe aquí el mensaje de bienvenida..."
+          rows="4"
+          class="font-medium text-gray-700"
+          helperText="El mensaje no debe exceder los 250 caracteres."
+          maxlength="250"
+          counter="true"
+        ></ion-textarea>
+      </ion-item>
+
+      <div class="flex justify-end space-x-3">
+        <ion-button 
+          fill="clear" 
+          color="medium" 
+          routerLink="/instructor/dashboard"
+          class="font-semibold"
+        >
+          Cancelar
+        </ion-button>
+        <ion-button 
+          expand="block" 
+          color="primary" 
+          (click)="saveSettings()"
+          class="font-bold min-w-[120px]"
+          [disabled]="isLoading"
+        >
+          Guardar
+          <ion-icon slot="end" name="save-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>
