@@ -23,7 +23,7 @@
         <p class="text-gray-600 text-sm mb-1"><span class="font-semibold">{{ routine.exercises?.length || 0 }}</span> Ejercicios</p>
       </div>
 
-      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg max-w-xs mx-auto w-full mt-auto shadow-lg shadow-indigo-200" (click)="startRoutine()">
+      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg max-w-xs mx-auto w-full mt-auto" (click)="startRoutine()">
         Iniciar Rutina
       </ion-button>
     </div>
@@ -91,7 +91,7 @@
         <ion-icon [name]="isPaused ? 'play' : 'pause'" slot="start"></ion-icon> Pausa
       </ion-button>
       <ion-button fill="clear" color="primary" class="font-bold flex-1" (click)="skipWait()">
-        Omitir Espera <ion-icon name="play-forward" slot="end"></ion-icon>
+        Omitir Espera <ion-icon class="pl-1" name="play-forward" slot="end"></ion-icon>
       </ion-button>
     </div>
   </div>
@@ -208,8 +208,8 @@
       </div>
     </div>
 
-    <div class="mt-auto pt-4 max-w-md mx-auto w-full">
-      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg shadow-lg" (click)="submitLog()">
+    <div class="mt-auto py-4 max-w-md mx-auto w-full">
+      <ion-button expand="block" shape="round" color="primary" class="h-14 font-bold text-lg" (click)="submitLog()">
         Finalizar Rutina
       </ion-button>
     </div>
