@@ -70,4 +70,6 @@ testem.log
 Thumbs.db
 
 
-# .firebase
+.firebase
+
+scripts/serviceAccountKey.json

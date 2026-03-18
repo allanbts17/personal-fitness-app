@@ -44,8 +44,8 @@ export class RegisterPage implements OnInit {
   }
 
   async register() {
-    if (!this.email || !this.password || !this.selectedGroup) {
-      this.showToast('Por favor completa todos los campos obligatorios.', 'warning');
+    if (!this.email || !this.password) {
+      this.showToast('Por favor completa el email y la contraseña.', 'warning');
       return;
     }
 
@@ -56,7 +56,8 @@ export class RegisterPage implements OnInit {
 
     // 1. Validate email domain or exceptions
     const emailLower = this.email.toLowerCase().trim();
-    const isException = this.config.email.exceptions.includes(emailLower);
+    const exceptionsLower = this.config.email.exceptions.map(e => e.toLowerCase().trim());
+    const isException = exceptionsLower.includes(emailLower);
     const hasValidDomain = emailLower.endsWith('@' + this.config.email.validDomain);
 
     if (!isException && !hasValidDomain) {
@@ -64,26 +65,35 @@ export class RegisterPage implements OnInit {
       return;
     }
 
-    // 2. Validate group limits
+    const role = isException ? 'instructor' : 'user';
+
+    if (role === 'user' && !this.selectedGroup) {
+      this.showToast('Por favor selecciona un curso.', 'warning');
+      return;
+    }
+
     this.isLoading = true;
     try {
-      const usersRef = collection(this.firestore, 'users');
-      const q = query(
-        usersRef,
-        where('role', '==', 'user'),
-        where('group', '==', this.selectedGroup)
-      );
-      const snapshot = await getDocs(q);
-      const currentCount = snapshot.size;
+      // 2. Validate group limits (only for users)
+      if (role === 'user') {
+        const usersRef = collection(this.firestore, 'users');
+        const q = query(
+          usersRef,
+          where('role', '==', 'user'),
+          where('group', '==', this.selectedGroup)
+        );
+        const snapshot = await getDocs(q);
+        const currentCount = snapshot.size;
 
-      const limit = this.config.studentLimitsPerGroup[1] || 30; // Max limit usually at index 1
-      if (currentCount >= limit) {
-        this.showToast(`El curso ${this.selectedGroup} ya no tiene cupos disponibles.`, 'danger');
-        this.isLoading = false;
-        return;
+        const limit = this.config.studentLimitsPerGroup[1] || 30; // Max limit usually at index 1
+        if (currentCount >= limit) {
+          this.showToast(`El curso ${this.selectedGroup} ya no tiene cupos disponibles.`, 'danger');
+          this.isLoading = false;
+          return;
+        }
       }
 
-      // 3. Register user
+      // 3. Register auth user
       const userCredential = await this.auth.register(emailLower, this.password);
 
       // 4. Extract name and lastname from email prefix
@@ -105,28 +115,38 @@ export class RegisterPage implements OnInit {
       const { doc, setDoc } = await import('@angular/fire/firestore');
       const docRef = doc(this.firestore, `users/${userCredential.user.uid}`);
 
-      // Fetch routines assigned to this group
-      const routinesQuery = query(collection(this.firestore, 'routines'), where('assignedGroups', 'array-contains', this.selectedGroup));
-      const routinesSnapshot = await getDocs(routinesQuery);
-      console.log("routines snapshot:", routinesSnapshot);
-      const assignedRoutineIds = routinesSnapshot.docs.map(d => d.id);
-      console.log("assignedRoutineIds:", assignedRoutineIds);
+      let assignedRoutineIds: string[] = [];
+      if (role === 'user') {
+        // Fetch routines assigned to this group
+        const routinesQuery = query(collection(this.firestore, 'routines'), where('assignedGroups', 'array-contains', this.selectedGroup));
+        const routinesSnapshot = await getDocs(routinesQuery);
+        assignedRoutineIds = routinesSnapshot.docs.map(d => d.id);
+      }
 
-      await setDoc(docRef, {
+      const userData: any = {
         uid: userCredential.user.uid,
         email: emailLower,
-        role: 'user',
-        group: this.selectedGroup,
+        role: role,
         name: name,
         lastname: lastname,
         displayName: `${name} ${lastname}`.trim(),
-        assignedRoutineIds: assignedRoutineIds
-      });
+      };
+
+      if (role === 'user') {
+        userData.group = this.selectedGroup;
+        userData.assignedRoutineIds = assignedRoutineIds;
+      }
+
+      await setDoc(docRef, userData);
 
       this.showToast('Cuenta creada con éxito. Iniciando sesión...', 'success');
       setTimeout(() => {
         this.isLoading = false;
-        this.router.navigate(['/user/home']);
+        if (role === 'instructor') {
+          this.router.navigate(['/instructor/dashboard']); // Redirigir al dashboard del instructor
+        } else {
+          this.router.navigate(['/user/home']);
+        }
       }, 500);
 
     } catch (err: any) {

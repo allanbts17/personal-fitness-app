@@ -52,7 +52,10 @@
           </div>
           <div>
             <h3 class="font-bold text-lg text-gray-800">{{ student.displayName || 'Estudiante' }}</h3>
-            <p class="text-sm text-gray-500">{{ student.email }}</p>
+            <p class="text-sm text-gray-500 mb-1">{{ student.email }}</p>
+            <span *ngIf="student.group !== undefined" class="inline-block px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md text-xs font-bold border border-indigo-100">
+              Curso: {{ student.group }}
+            </span>
           </div>
         </div>
 
