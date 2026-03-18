@@ -26,3 +26,10 @@ div[activeLog] {
         transform: translateY(0);
     }
 }
+
+ion-input, ion-select, ion-textarea {
+  --color: #1f2937;
+  --highlight-color-focused: #1976D2;
+  --highlight-color-valid: #1976D2;
+  --highlight-color-invalid: #1976D2;
+}

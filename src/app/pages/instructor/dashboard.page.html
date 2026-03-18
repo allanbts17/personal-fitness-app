@@ -7,49 +7,34 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
       <!-- Configuración General -->
-      <div 
-        routerLink="/instructor/settings"
-        class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-        <div class="flex items-center space-x-4">
-          <div class="bg-purple-100 p-3 rounded-full text-purple-600">
-            <ion-icon name="settings" class="text-2xl"></ion-icon>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Configuración General</h3>
-            <p class="text-sm text-gray-500">Personalizar mensajes y ajustes globales</p>
-          </div>
-        </div>
-      </div>
+      <app-action-card
+        link="/instructor/settings"
+        title="Configuración General"
+        description="Personalizar mensajes y ajustes globales"
+        iconName="settings"
+        iconBgClass="bg-purple-100"
+        iconTextClass="text-purple-600">
+      </app-action-card>
 
       <!-- Mis Estudiantes -->
-      <div 
-        routerLink="/instructor/students"
-        class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-        <div class="flex items-center space-x-4">
-          <div class="bg-blue-100 p-3 rounded-full text-blue-600">
-            <ion-icon name="people" class="text-2xl"></ion-icon>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Mis Estudiantes</h3>
-            <p class="text-sm text-gray-500">Ver y gestionar el progreso de los estudiantes</p>
-          </div>
-        </div>
-      </div>
+      <app-action-card
+        link="/instructor/students"
+        title="Mis Estudiantes"
+        description="Ver y gestionar el progreso de los estudiantes"
+        iconName="people"
+        iconBgClass="bg-blue-100"
+        iconTextClass="text-blue-600">
+      </app-action-card>
 
       <!-- Ejercicios -->
-      <div 
-        routerLink="/instructor/manage-routines"
-        class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-        <div class="flex items-center space-x-4">
-          <div class="bg-green-100 p-3 rounded-full text-green-600">
-            <ion-icon name="barbell" class="text-2xl"></ion-icon>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-800">Ejercicios</h3>
-            <p class="text-sm text-gray-500">Crear y editar la biblioteca de ejercicios</p>
-          </div>
-        </div>
-      </div>
+      <app-action-card
+        link="/instructor/manage-routines"
+        title="Ejercicios"
+        description="Crear y editar la biblioteca de ejercicios"
+        iconName="barbell"
+        iconBgClass="bg-green-100"
+        iconTextClass="text-green-600">
+      </app-action-card>
     </div>
   </div>
 </ion-content>

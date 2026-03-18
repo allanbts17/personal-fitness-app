@@ -24,9 +24,8 @@
     border-bottom-width: 2px;
   }
 
-  ion-input {
+  ion-input, ion-select, ion-textarea {
     --color: #1f2937;
-    //--placeholder-color: #9ca3af;
     --padding-bottom: 8px;
     --highlight-color-focused: #1976D2;
     --highlight-color-valid: #1976D2;

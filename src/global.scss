@@ -47,3 +47,10 @@ ion-input, ion-select {
   --highlight-color-invalid: #1976D2;
   font-size: 14px;
 }
+
+ion-textarea {
+  --color: #1f2937;
+  --highlight-color-focused: #1976D2;
+  --highlight-color-valid: #1976D2;
+  --highlight-color-invalid: #1976D2;
+}

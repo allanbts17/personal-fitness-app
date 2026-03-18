@@ -5,6 +5,7 @@ import { LoadingController, ToastController } from '@ionic/angular';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
+  styleUrls: ['./settings.page.scss'],
   standalone: false
 })
 export class SettingsPage implements OnInit {
@@ -15,7 +16,7 @@ export class SettingsPage implements OnInit {
     private fitnessService: FitnessService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.loadSettings();
@@ -46,7 +47,7 @@ export class SettingsPage implements OnInit {
       await this.fitnessService.updateGeneralConfig({
         welcomeMessage: this.welcomeMessage
       });
-      
+
       const toast = await this.toastCtrl.create({
         message: 'Configuración guardada exitosamente',
         duration: 2000,
