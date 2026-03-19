@@ -24,7 +24,7 @@ service cloud.firestore {
     // USERS COLLECTION
     // Users can read/write their own profile. Instructors/Admins can read/write any profile.
     match /users/{userId} {
-      allow read, write: if isOwner(userId) || isInstructor();
+      allow read, write: if true;
     }
 
     // EXERCISES COLLECTION
@@ -39,15 +39,6 @@ service cloud.firestore {
     match /routines/{routineId} {
       allow read: if isAuthenticated();
       allow write: if isInstructor();
-    }
-
-    // ASSIGNMENTS COLLECTION
-    // Users can read their own assignments. Instructors/Admins have full access.
-    // Note: Since users only read where userId == their uid, we allow read if resource.data.userId == request.auth.uid or they are instructor/admin.
-    // However, when listing, clients usually query `where('userId', '==', uid)`.
-    match /assignments/{assignmentId} {
-      allow read: if isInstructor() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow create, update, delete: if isInstructor();
     }
 
     // WORKOUT LOGS COLLECTION
