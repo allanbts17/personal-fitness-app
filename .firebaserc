@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "fitness-app-control"
-  }
+  },
+  "targets": {
+    "fitness-app-control": {
+      "database": {
+        "default": [
+          "default"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
