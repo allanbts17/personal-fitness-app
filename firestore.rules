@@ -16,33 +16,29 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
     }
 
-    function isInstructorOrAdmin() {
+    function isInstructor() {
       let role = getUserRole();
-      return role == 'instructor' || role == 'admin';
-    }
-
-    function isAdmin() {
-      return getUserRole() == 'admin';
+      return role == 'instructor';
     }
 
     // USERS COLLECTION
     // Users can read/write their own profile. Instructors/Admins can read/write any profile.
     match /users/{userId} {
-      allow read, write: if isOwner(userId) || isInstructorOrAdmin();
+      allow read, write: if isOwner(userId) || isInstructor();
     }
 
     // EXERCISES COLLECTION
     // Authenticated users can read. Only Instructors/Admins can write.
     match /exercises/{exerciseId} {
       allow read: if isAuthenticated();
-      allow write: if isInstructorOrAdmin();
+      allow write: if isInstructor();
     }
 
     // ROUTINES COLLECTION
     // Authenticated users can read. Only Instructors/Admins can write.
     match /routines/{routineId} {
       allow read: if isAuthenticated();
-      allow write: if isInstructorOrAdmin();
+      allow write: if isInstructor();
     }
 
     // ASSIGNMENTS COLLECTION
@@ -50,30 +46,30 @@ service cloud.firestore {
     // Note: Since users only read where userId == their uid, we allow read if resource.data.userId == request.auth.uid or they are instructor/admin.
     // However, when listing, clients usually query `where('userId', '==', uid)`.
     match /assignments/{assignmentId} {
-      allow read: if isInstructorOrAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow create, update, delete: if isInstructorOrAdmin();
+      allow read: if isInstructor() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if isInstructor();
     }
 
     // WORKOUT LOGS COLLECTION
     // Users can read and write their own logs. Instructors/Admins can also read/delete logs.
     match /workout_logs/{logId} {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow read, update: if isAuthenticated() && resource.data.userId == request.auth.uid || isInstructorOrAdmin();
-      allow delete: if isInstructorOrAdmin();
+      allow read, update: if isAuthenticated() && resource.data.userId == request.auth.uid || isInstructor();
+      allow delete: if isInstructor();
     }
 
     // CONFIG COLLECTION
     // Authenticated users can read config rules (like general). Admins can write.
     match /config/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isInstructor();
     }
 
     // DATA/CONFIG (Specific path for public signup config)
     // Public read is necessary for the registration screen to check domains/exceptions.
     match /data/config {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isInstructor();
     }
   }
 }
