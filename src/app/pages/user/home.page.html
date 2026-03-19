@@ -100,7 +100,7 @@
         <div class="relative w-14 h-14 flex items-center justify-center shrink-0">
           <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
             <path class="text-indigo-50" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path class="text-[#2a52be] transition-all duration-1000 ease-in-out" [attr.stroke-dasharray]="globalProgress + ', 100'" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path *ngIf="globalProgress > 0" class="text-[#2a52be] transition-all duration-1000 ease-in-out" [attr.stroke-dasharray]="globalProgress + ', 100'" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
           </svg>
           <div class="absolute text-[10px] font-extrabold text-[#2a52be]">{{ globalProgress }}%</div>
         </div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion, setDoc, getDocs } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../models/fitness.models';
 
@@ -111,6 +111,21 @@ export class FitnessService {
     assignRoutineToUser(userId: string, routineId: string) {
         const docRef = doc(this.firestore, `users/${userId}`);
         return updateDoc(docRef, { assignedRoutineIds: arrayUnion(routineId) });
+    }
+
+    async updateStudentGroup(userId: string, newGroup: number) {
+        const docRef = doc(this.firestore, `users/${userId}`);
+        
+        // Fetch routines assigned to the new group
+        const routinesCol = collection(this.firestore, 'routines');
+        const q = query(routinesCol, where('assignedGroups', 'array-contains', newGroup));
+        const routinesSnapshot = await getDocs(q);
+        const assignedRoutineIds = routinesSnapshot.docs.map(d => d.id);
+
+        return updateDoc(docRef, { 
+            group: newGroup,
+            assignedRoutineIds: assignedRoutineIds 
+        });
     }
 
     getGeneralConfig(): Observable<any> {

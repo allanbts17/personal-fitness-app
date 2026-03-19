@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FitnessService } from 'src/app/services/fitness.service';
 import { UserProfile, WorkoutLog, Routine } from 'src/app/models/fitness.models';
 import { firstValueFrom } from 'rxjs';
+import { AlertController, ToastController } from '@ionic/angular';
+import { GlobalConfigService } from 'src/app/services/global-config.service';
 
 interface StudentProgress extends UserProfile {
   completedRoutines: number;
@@ -21,8 +23,14 @@ export class StudentsPage implements OnInit {
   searchTerm: string = '';
   selectedGroup: number | 'all' = 'all';
   availableGroups: number[] = [];
+  allValidGroups: number[] = [];
 
-  constructor(private fitnessService: FitnessService) { }
+  constructor(
+    private fitnessService: FitnessService,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
+    private globalConfig: GlobalConfigService
+  ) { }
 
   ngOnInit() {
     this.loadStudents();
@@ -52,7 +60,7 @@ export class StudentsPage implements OnInit {
         if (r.id) routineMap.set(r.id, r);
       });
 
-      // Extract unique groups
+      // Extract unique groups from current students
       const groups = new Set<number>();
       users.forEach((user: any) => {
         if (user.group !== undefined && user.group !== null) {
@@ -60,6 +68,18 @@ export class StudentsPage implements OnInit {
         }
       });
       this.availableGroups = Array.from(groups).sort((a, b) => a - b);
+
+      // Extract all valid groups from global config
+      const config = this.globalConfig.getCurrentConfig();
+      if (config && config.groupRange && config.groupRange.length === 2) {
+        const start = config.groupRange[0];
+        const end = config.groupRange[1];
+        const allGroups = [];
+        for (let i = start; i <= end; i++) {
+          allGroups.push(i);
+        }
+        this.allValidGroups = allGroups;
+      }
 
       const studentsWithProgress = await Promise.all(users.map(async (user) => {
         const logs = await firstValueFrom(this.fitnessService.getUserLogs(user.uid));
@@ -112,6 +132,60 @@ export class StudentsPage implements OnInit {
       this.students = studentsWithProgress;
     } catch (error) {
       console.error('Error loading students:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async changeCourse(student: StudentProgress) {
+    const alert = await this.alertCtrl.create({
+      header: 'Cambiar Curso',
+      subHeader: `Estudiante: ${student.displayName}`,
+      message: 'Selecciona el nuevo curso para el estudiante. Esto también actualizará sus rutinas asignadas.',
+      inputs: this.allValidGroups.map(group => ({
+        type: 'radio',
+        label: `Curso ${group}`,
+        value: group,
+        checked: student.group === group
+      })),
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Cambiar',
+          handler: (newGroup) => {
+            if (newGroup !== undefined && newGroup !== student.group) {
+              this.updateStudentGroup(student.uid, newGroup);
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async updateStudentGroup(userId: string, newGroup: number) {
+    this.isLoading = true;
+    try {
+      await this.fitnessService.updateStudentGroup(userId, newGroup);
+      const toast = await this.toastCtrl.create({
+        message: 'Curso actualizado con éxito.',
+        duration: 2000,
+        color: 'success'
+      });
+      toast.present();
+      await this.loadStudents();
+    } catch (error) {
+      console.error('Error updating student group:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'Error al actualizar el curso.',
+        duration: 3000,
+        color: 'danger'
+      });
+      toast.present();
     } finally {
       this.isLoading = false;
     }
