@@ -156,7 +156,7 @@ export class ManageRoutinesPage implements OnInit {
           this.parsedNewExercises.push({
             id: exerciseId,
             name: rawExerciseName,
-            description: 'Importado de Excel',
+            description: '',
           });
         }
       }

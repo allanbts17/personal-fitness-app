@@ -1,13 +1,13 @@
 export const environment = {
     production: false,
     firebase: {
-        apiKey: "AIzaSyDIIrnqHZn9eDgaq9LPg9LK7AGwt9S_7Wc",
-        authDomain: "fitness-app-control.firebaseapp.com",
-        projectId: "fitness-app-control",
-        storageBucket: "fitness-app-control.firebasestorage.app",
-        messagingSenderId: "171668276774",
-        appId: "1:171668276774:web:673254a33fc1008c6cc8e7",
-        measurementId: "G-ZS7ZKYRZ7R"
+        apiKey: "AIzaSyDNVxtBWwIFuNj4AUS6y0GV-natXVqFjyo",
+        authDomain: "fitness-app-control-test.firebaseapp.com",
+        projectId: "fitness-app-control-test",
+        storageBucket: "fitness-app-control-test.firebasestorage.app",
+        messagingSenderId: "927903486943",
+        appId: "1:927903486943:web:b97496db33571c29e66a6a",
+        measurementId: "G-TSHDN23RX0"
     },
     databaseId: "default"
 };

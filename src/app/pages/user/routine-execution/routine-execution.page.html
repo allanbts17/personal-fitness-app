@@ -75,7 +75,7 @@
       </div>
       <div class="flex items-center space-x-4 text-left">
         <div class="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
-          <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/icon/generic-fitness.png'" class="object-cover w-full h-full opacity-50" onerror="this.src='assets/icon/generic-fitness.png';" />
+          <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/generic-fitness.png'" class="object-cover w-full h-full opacity-50" onerror="this.src='assets/generic-fitness.png';" />
         </div>
         <div>
           <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ currentSetData.actualExercise?.name || currentSetData.routineExercise.exerciseName }}</h3>
@@ -113,7 +113,7 @@
 
     <div class="w-full aspect-video bg-gray-200 rounded-3xl overflow-hidden mb-8 shadow-inner flex items-center justify-center">
         <!-- Generic Image or Exercise Image -->
-        <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/icon/generic-fitness.png'" class="object-cover w-full h-full" onerror="this.src='assets/icon/generic-fitness.png';" />
+        <img [src]="currentSetData.actualExercise?.videoUrl || 'assets/generic-fitness.png'" class="object-cover w-full h-full" onerror="this.src='assets/generic-fitness.png';" />
     </div>
 
     <!-- Timer Setup -->
