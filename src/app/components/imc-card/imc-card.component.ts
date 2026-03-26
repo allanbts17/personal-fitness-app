@@ -35,12 +35,15 @@ export class ImcCardComponent implements OnInit, OnChanges {
   // 30 - 34.9: Obesidad I (Naranja)
   // >= 35: Obesidad II+ (Rojo)
   calculateCategory() {
-    if (this.bmi < 18.5) {
+    if (this.bmi < 16) {
       this.category = 'Bajo peso';
       this.categoryColor = '#4169E1'; // RoyalBlue
+    } else if (this.bmi < 18.5) {
+      this.category = 'Bajo peso';
+      this.categoryColor = '#6495ED'; // CornflowerBlue
     } else if (this.bmi < 25) {
       this.category = 'Peso saludable';
-      this.categoryColor = '#66CDAA'; // MediumAquamarine (Cyan-ish)
+      this.categoryColor = '#78C5D6'; // Light Blue/Cyan
     } else if (this.bmi < 30) {
       this.category = 'Sobrepeso';
       this.categoryColor = '#F4D03F'; // Yellow
@@ -49,20 +52,40 @@ export class ImcCardComponent implements OnInit, OnChanges {
       this.categoryColor = '#F0B27A'; // Orange
     } else {
       this.category = 'Obesidad II+';
-      this.categoryColor = '#E74C3C'; // Red
+      this.categoryColor = '#CD5C5C'; // IndianRed (matches last segment)
     }
 
-    // Calcular posición del indicador (mínimo 15, máximo 40 en la barra visual de la imagen)
-    // Para simplificar, la barra va de un factor ~13 hasta ~42.
-    // Haremos regla de 3 simple o limitarlo visualmente.
-    const minVal = 13;
-    const maxVal = 42;
-    let percent = ((this.bmi - minVal) / (maxVal - minVal)) * 100;
+    // Calcular posición del indicador basada en segmentos visuales (Piecewise Linear Interpolation)
+    // Coordenadas (BMI -> Visual %) basadas en el diseño:
+    // 15 -> 0%
+    // 16 -> 15%
+    // 18.5 -> 40%
+    // 25 -> 60%
+    // 30 -> 75%
+    // 35 -> 90%
+    // 40 -> 100%
+    
+    let percent = 0;
+    const val = this.bmi;
 
-    if (percent < 0) percent = 0;
-    if (percent > 100) percent = 100;
+    if (val <= 15) {
+      percent = 0;
+    } else if (val <= 16) {
+      percent = (val - 15) / (16 - 15) * 15;
+    } else if (val <= 18.5) {
+      percent = 15 + (val - 16) / (18.5 - 16) * (40 - 15);
+    } else if (val <= 25) {
+      percent = 40 + (val - 18.5) / (25 - 18.5) * (60 - 40);
+    } else if (val <= 30) {
+      percent = 60 + (val - 25) / (30 - 25) * (75 - 60);
+    } else if (val <= 35) {
+      percent = 75 + (val - 30) / (35 - 30) * (90 - 75);
+    } else if (val <= 40) {
+      percent = 90 + (val - 35) / (40 - 35) * (100 - 90);
+    } else {
+      percent = 100;
+    }
 
-    // Add offset specifically for the visual bar 
     this.indicatorPosition = `${percent}%`;
   }
 
