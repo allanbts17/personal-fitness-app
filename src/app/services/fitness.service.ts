@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, docData, addDoc, updateDoc, deleteDoc, query, where, orderBy, arrayUnion, setDoc, getDocs } from '@angular/fire/firestore';
+import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
 import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../models/fitness.models';
 
@@ -7,7 +8,7 @@ import { Exercise, Routine, Assignment, WorkoutLog, UserProfile } from '../model
     providedIn: 'root'
 })
 export class FitnessService {
-    constructor(private firestore: Firestore) { }
+    constructor(private firestore: Firestore, private storage: Storage) { }
 
     // EXERCISES
     getExercises(): Observable<Exercise[]> {
@@ -28,6 +29,13 @@ export class FitnessService {
     updateExercise(exerciseId: string, data: Partial<Exercise>) {
         const docRef = doc(this.firestore, `exercises/${exerciseId}`);
         return updateDoc(docRef, data);
+    }
+
+    async uploadExerciseImage(file: File, exerciseId: string): Promise<string> {
+        const filePath = `exercises/${exerciseId}_${new Date().getTime()}`;
+        const fileRef = ref(this.storage, filePath);
+        await uploadBytes(fileRef, file);
+        return getDownloadURL(fileRef);
     }
 
     // ROUTINES

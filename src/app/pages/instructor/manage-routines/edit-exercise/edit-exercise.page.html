@@ -32,8 +32,8 @@
           <div class="flex items-center space-x-4">
             <!-- Icono o Imagen pequeña -->
             <div class="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center text-blue-600 overflow-hidden">
-              <img *ngIf="ex.videoUrl" [src]="ex.videoUrl" class="w-full h-full object-cover">
-              <ion-icon *ngIf="!ex.videoUrl" name="barbell-outline" class="text-2xl"></ion-icon>
+              <img *ngIf="ex.imageUrl" [src]="ex.imageUrl" class="w-full h-full object-cover">
+              <ion-icon *ngIf="!ex.imageUrl" name="barbell-outline" class="text-2xl"></ion-icon>
             </div>
             
             <div>
@@ -84,22 +84,34 @@
           ></ion-textarea>
         </div>
 
-        <!-- URL de Imagen -->
+        <!-- Imagen del Ejercicio -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">URL de Imagen (GIF, PNG, JPG)</label>
-          <ion-input
-            type="url"
-            [(ngModel)]="editVideoUrl"
-            placeholder="https://ejemplo.com/ejercicio.gif"
-            class="bg-gray-50 border border-gray-200 rounded-lg px-4"
-          ></ion-input>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Imagen del Ejercicio</label>
+          
+          <div class="flex items-center space-x-4">
+            <ion-button (click)="fileInput.click()" [disabled]="isUploading" color="secondary" fill="outline" class="w-full">
+              <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+              {{ isUploading ? 'Subiendo...' : 'Subir Imagen' }}
+            </ion-button>
+            
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+          </div>
+
+          <div *ngIf="isUploading" class="mt-2 flex items-center space-x-2 text-blue-600">
+            <ion-spinner name="crescent" size="small"></ion-spinner>
+            <span class="text-xs">Subiendo imagen al servidor...</span>
+          </div>
+          
+          <div class="mt-2" *ngIf="editImageUrl && !isUploading">
+            <p class="text-xs text-gray-400 truncate">URL actual: {{ editImageUrl }}</p>
+          </div>
         </div>
 
         <!-- Previsualizar Imagen -->
-        <div *ngIf="editVideoUrl" class="mt-4">
+        <div *ngIf="editImageUrl" class="mt-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">Vista previa de la imagen</label>
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-2 max-w-sm">
-             <img [src]="editVideoUrl" class="w-full h-auto rounded" (error)="editVideoUrl = ''" alt="Preview no disponible">
+             <img [src]="editImageUrl" class="w-full h-auto rounded" (error)="editImageUrl = ''" alt="Preview no disponible">
           </div>
         </div>
 

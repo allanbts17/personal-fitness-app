@@ -47,3 +47,10 @@ ion-input, ion-select, ion-textarea {
   --highlight-color-invalid: #1976D2;
   font-size: 14px;
 }
+
+/* Custom styles for alerts */
+.custom-alert-info {
+  .alert-message {
+    white-space: pre-wrap;
+  }
+}

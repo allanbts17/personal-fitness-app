@@ -25,7 +25,8 @@ export class EditExercisePage implements OnInit {
   // Variables de edición
   editName: string = '';
   editDescription: string = '';
-  editVideoUrl: string = '';
+  editImageUrl: string = '';
+  isUploading: boolean = false;
 
   constructor(
     private fitnessService: FitnessService,
@@ -63,11 +64,28 @@ export class EditExercisePage implements OnInit {
     this.selectedExercise = exercise;
     this.editName = exercise.name;
     this.editDescription = exercise.description || '';
-    this.editVideoUrl = exercise.videoUrl || '';
+    this.editImageUrl = exercise.imageUrl || '';
   }
 
   cancelEdit() {
     this.selectedExercise = null;
+  }
+
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file || !this.selectedExercise?.id) return;
+
+    this.isUploading = true;
+    try {
+      const downloadUrl = await this.fitnessService.uploadExerciseImage(file, this.selectedExercise.id);
+      this.editImageUrl = downloadUrl;
+      this.mostrarToast('Imagen subida correctamente', 'success');
+    } catch (error) {
+      console.error('Error al subir imagen:', error);
+      this.mostrarToast('Error al subir la imagen', 'danger');
+    } finally {
+      this.isUploading = false;
+    }
   }
 
   async saveChanges() {
@@ -87,7 +105,7 @@ export class EditExercisePage implements OnInit {
       await this.fitnessService.updateExercise(this.selectedExercise.id, {
         name: this.editName.trim(),
         description: this.editDescription.trim(),
-        videoUrl: this.editVideoUrl.trim()
+        imageUrl: this.editImageUrl.trim()
       });
 
       loading.dismiss();
